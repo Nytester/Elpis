@@ -29,6 +29,7 @@ export function PatientDataProvider({ children }) {
   const [patientId, setPatientId] = useState(null);
   const [symptoms, setSymptoms] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [authorizations, setAuthorizations] = useState([]);
 
   // Resolve the logged-in user's own patients.id row
   useEffect(() => {
@@ -36,6 +37,7 @@ export function PatientDataProvider({ children }) {
       setPatientId(null);
       setSymptoms([]);
       setMessages([]);
+      setAuthorizations([]);
       return;
     }
     supabase.from('patients').select('id').eq('profile_id', session.user.id).single()
@@ -94,6 +96,33 @@ export function PatientDataProvider({ children }) {
     };
   }, [patientId, session]);
 
+  // Load + realtime-subscribe to this patient's own authorizations (read-only —
+  // only the provider writes to this table)
+  useEffect(() => {
+    if (!patientId) return;
+
+    let active = true;
+    const load = () => {
+      supabase
+        .from('authorizations')
+        .select('*')
+        .eq('patient_id', patientId)
+        .order('submitted_date', { ascending: false })
+        .then(({ data }) => { if (active) setAuthorizations(data ?? []); });
+    };
+    load();
+
+    const channel = supabase
+      .channel(`authorizations-${patientId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'authorizations', filter: `patient_id=eq.${patientId}` }, load)
+      .subscribe();
+
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [patientId]);
+
   const sendMessage = useCallback(async (body) => {
     if (!patientId || !session) return;
     await supabase.from('messages').insert({ patient_id: patientId, author_id: session.user.id, body });
@@ -110,7 +139,7 @@ export function PatientDataProvider({ children }) {
   }, [patientId]);
 
   return (
-    <PatientDataContext.Provider value={{ symptoms, logSymptom, requestRefill, messages, sendMessage }}>
+    <PatientDataContext.Provider value={{ symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations }}>
       {children}
     </PatientDataContext.Provider>
   );

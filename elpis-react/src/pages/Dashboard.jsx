@@ -15,11 +15,13 @@ const INITIAL_MEDS = [
 
 export default function Dashboard() {
   const [meds, setMeds] = useState(INITIAL_MEDS);
-  const { symptoms } = usePatientData();
+  const { symptoms, authorizations } = usePatientData();
   const { profile } = useAuth();
   const firstName = profile?.full_name?.split(' ')[0] ?? '';
 
   const toggleMed = (id) => setMeds((ms) => ms.map((m) => m.id === id ? { ...m, done: !m.done } : m));
+
+  const atRiskAuth = authorizations.find((a) => a.at_risk_note && !['approved', 'denied'].includes(a.status));
 
   return (
     <div className="ep-shell-dash">
@@ -34,6 +36,14 @@ export default function Dashboard() {
           </div>
           <a className="btn btn-secondary" href="#">Log a symptom</a>
         </div>
+
+        {atRiskAuth && (
+          <div className="card elev-sm" style={{ borderColor: 'var(--color-accent)', marginBottom: 'var(--space-4)' }}>
+            <span className="tag tag-accent" style={{ alignSelf: 'flex-start' }}>May affect your care</span>
+            <h4 className="card-title" style={{ marginTop: 4 }}>{atRiskAuth.procedure} authorization: {atRiskAuth.at_risk_note}</h4>
+            <Link className="btn btn-secondary" to="/dashboard/insurance">View insurance status</Link>
+          </div>
+        )}
 
         <div className="ep-grid">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>

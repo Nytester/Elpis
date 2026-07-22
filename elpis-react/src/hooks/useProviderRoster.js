@@ -21,18 +21,26 @@ export function useProviderRoster() {
       if (!active || !patientRows) return;
 
       const ids = patientRows.map((p) => p.id);
-      const [{ data: symptomRows }, { data: refillRows }] = await Promise.all([
+      const [{ data: symptomRows }, { data: refillRows }, { data: authRows }, { data: inviteRows }] = await Promise.all([
         supabase.from('symptoms').select('*').in('patient_id', ids).order('logged_at', { ascending: false }),
         supabase.from('refill_requests').select('*').in('patient_id', ids).eq('status', 'pending'),
+        supabase.from('authorizations').select('*').in('patient_id', ids),
+        supabase.from('patient_invites').select('*').in('patient_id', ids).eq('status', 'pending'),
       ]);
 
       const merged = patientRows.map((p) => {
         const latestSymptom = symptomRows?.find((s) => s.patient_id === p.id);
         const pendingRefills = refillRows?.filter((r) => r.patient_id === p.id).length ?? 0;
+        const atRiskAuth = authRows?.find((a) =>
+          a.patient_id === p.id && a.at_risk_note && !['approved', 'denied'].includes(a.status)
+        );
         const alert = latestSymptom?.severity === 'Severe'
           ? `${latestSymptom.symptom} logged as Severe`
+          : atRiskAuth
+          ? atRiskAuth.at_risk_note
           : null;
-        return { ...p, alert, pendingRefills };
+        const invitePending = !p.profile_id && inviteRows?.some((i) => i.patient_id === p.id);
+        return { ...p, alert, pendingRefills, invitePending };
       });
 
       if (active) {
@@ -47,6 +55,9 @@ export function useProviderRoster() {
       .channel(`provider-roster-${session.user.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'symptoms' }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'refill_requests' }, load)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'authorizations' }, load)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'patients' }, load)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'patient_invites' }, load)
       .subscribe();
 
     return () => {

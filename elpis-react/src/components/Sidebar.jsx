@@ -39,6 +39,10 @@ const NAV_ITEMS = [
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z" /><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /></svg>,
   },
   {
+    label: 'Insurance', href: '/dashboard/insurance',
+    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" /><path d="M9 12l2 2 4-4" /></svg>,
+  },
+  {
     label: 'Settings', href: '/dashboard/settings',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.4-1.6-2.8-2.3.9a7 7 0 0 0-1.8-1l-.3-2.4H10l-.3 2.4a7 7 0 0 0-1.8 1l-2.3-.9-1.6 2.8 2 1.4A7 7 0 0 0 5.8 12a7 7 0 0 0 .2 1.6l-2 1.4 1.6 2.8 2.3-.9a7 7 0 0 0 1.8 1l.3 2.4h4l.3-2.4a7 7 0 0 0 1.8-1l2.3.9 1.6-2.8-2-1.4c.13-.5.2-1 .2-1.6z" /></svg>,
   },

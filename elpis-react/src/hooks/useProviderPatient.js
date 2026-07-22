@@ -9,6 +9,7 @@ export function useProviderPatient(patientId) {
   const [symptoms, setSymptoms] = useState([]);
   const [refillRequests, setRefillRequests] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [authorizations, setAuthorizations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,11 +17,12 @@ export function useProviderPatient(patientId) {
 
     let active = true;
     const load = async () => {
-      const [{ data: patientRow }, { data: symptomRows }, { data: refillRows }, { data: messageRows }] = await Promise.all([
+      const [{ data: patientRow }, { data: symptomRows }, { data: refillRows }, { data: messageRows }, { data: authRows }] = await Promise.all([
         supabase.from('patients').select('*').eq('id', patientId).single(),
         supabase.from('symptoms').select('*').eq('patient_id', patientId).order('logged_at', { ascending: false }),
         supabase.from('refill_requests').select('*').eq('patient_id', patientId).order('requested_at', { ascending: false }),
         supabase.from('messages').select('*').eq('patient_id', patientId).order('created_at', { ascending: true }),
+        supabase.from('authorizations').select('*').eq('patient_id', patientId).order('submitted_date', { ascending: false }),
       ]);
 
       if (!active) return;
@@ -35,6 +37,7 @@ export function useProviderPatient(patientId) {
         text: m.body,
         time: formatMessageTime(m.created_at),
       })));
+      setAuthorizations(authRows ?? []);
       setLoading(false);
     };
 
@@ -45,6 +48,7 @@ export function useProviderPatient(patientId) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'symptoms', filter: `patient_id=eq.${patientId}` }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'refill_requests', filter: `patient_id=eq.${patientId}` }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `patient_id=eq.${patientId}` }, load)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'authorizations', filter: `patient_id=eq.${patientId}` }, load)
       .subscribe();
 
     return () => {
@@ -57,6 +61,23 @@ export function useProviderPatient(patientId) {
     await supabase.rpc('mark_refill_handled', { request_id: requestId });
   }, []);
 
+  const addAuthorization = useCallback(async (procedure) => {
+    if (!patientId || !session) return;
+    await supabase.from('authorizations').insert({ patient_id: patientId, procedure, created_by: session.user.id });
+  }, [patientId, session]);
+
+  const updateAuthorizationStatus = useCallback(async (authorizationId, status, decisionDate) => {
+    await supabase.rpc('update_authorization_status', {
+      authorization_id: authorizationId,
+      new_status: status,
+      new_decision_date: decisionDate ?? null,
+    });
+  }, []);
+
+  const setRiskNote = useCallback(async (authorizationId, note) => {
+    await supabase.rpc('set_authorization_risk_note', { authorization_id: authorizationId, note: note || null });
+  }, []);
+
   const sendMessage = useCallback(async (body) => {
     if (!patientId || !session) return;
     await supabase.from('messages').insert({ patient_id: patientId, author_id: session.user.id, body });
@@ -65,5 +86,8 @@ export function useProviderPatient(patientId) {
   const latestSymptom = symptoms[0];
   const alert = latestSymptom?.severity === 'Severe' ? `${latestSymptom.name} logged as Severe` : null;
 
-  return { patient, symptoms, refillRequests, messages, sendMessage, alert, loading, markRefillHandled };
+  return {
+    patient, symptoms, refillRequests, messages, sendMessage, alert, loading, markRefillHandled,
+    authorizations, addAuthorization, updateAuthorizationStatus, setRiskNote,
+  };
 }

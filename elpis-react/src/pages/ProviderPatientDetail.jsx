@@ -2,14 +2,45 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ProviderSidebar from '../components/ProviderSidebar.jsx';
 import { useProviderPatient } from '../hooks/useProviderPatient.js';
+import { getSteps } from '../lib/authorizationSteps.js';
 
 const SEVERITY_TAG = { Mild: 'tag-neutral', Moderate: 'tag-accent-2', Severe: 'tag-accent' };
 
 export default function ProviderPatientDetail() {
   const { id } = useParams();
-  const { patient, symptoms, refillRequests, messages, sendMessage, alert, loading, markRefillHandled } = useProviderPatient(id);
+  const {
+    patient, symptoms, refillRequests, messages, sendMessage, alert, loading, markRefillHandled,
+    authorizations, addAuthorization, updateAuthorizationStatus, setRiskNote,
+  } = useProviderPatient(id);
   const [draft, setDraft] = useState('');
   const scrollRef = useRef(null);
+  const [newProcedure, setNewProcedure] = useState('');
+  const [riskDraftId, setRiskDraftId] = useState(null);
+  const [riskDraftText, setRiskDraftText] = useState('');
+
+  const handleAddAuthorization = (e) => {
+    e.preventDefault();
+    const procedure = newProcedure.trim();
+    if (!procedure) return;
+    addAuthorization(procedure);
+    setNewProcedure('');
+  };
+
+  const openRiskEditor = (a) => {
+    setRiskDraftId(a.id);
+    setRiskDraftText(a.at_risk_note ?? '');
+  };
+
+  const saveRiskNote = () => {
+    setRiskNote(riskDraftId, riskDraftText.trim());
+    setRiskDraftId(null);
+    setRiskDraftText('');
+  };
+
+  const clearRiskNote = (authorizationId) => {
+    setRiskNote(authorizationId, null);
+    if (riskDraftId === authorizationId) setRiskDraftId(null);
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -119,6 +150,82 @@ export default function ProviderPatientDetail() {
               <h4 className="card-title">Assigned provider</h4>
               <Link className="btn btn-primary btn-block" to="/provider/inbox">Go to Inbox</Link>
             </div>
+          </div>
+        </div>
+
+        <div className="card elev-sm" style={{ marginTop: 'var(--space-4)' }}>
+          <span className="card-kicker">Insurance</span>
+          <h4 className="card-title">Authorization requests</h4>
+
+          <form onSubmit={handleAddAuthorization} style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
+            <input
+              className="input"
+              placeholder="Procedure, e.g. Cervical spine MRI"
+              value={newProcedure}
+              onChange={(e) => setNewProcedure(e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <button type="submit" className="btn btn-secondary" disabled={!newProcedure.trim()}>Log authorization</button>
+          </form>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
+            {authorizations.length === 0 && <p className="text-muted" style={{ fontSize: 13 }}>No authorization requests yet.</p>}
+            {authorizations.map((a) => (
+              <div key={a.id} style={{ padding: 'var(--space-3)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{a.procedure}</div>
+                    <div className="text-muted" style={{ fontSize: 11 }}>Submitted {a.submitted_date}{a.decision_date ? ` · Decided ${a.decision_date}` : ''}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {a.status === 'submitted' && (
+                      <button className="btn btn-secondary" onClick={() => updateAuthorizationStatus(a.id, 'under_review')}>Mark under review</button>
+                    )}
+                    {a.status === 'under_review' && (
+                      <>
+                        <button className="btn btn-secondary" onClick={() => updateAuthorizationStatus(a.id, 'approved', new Date().toISOString().slice(0, 10))}>Approve</button>
+                        <button className="btn btn-secondary" onClick={() => updateAuthorizationStatus(a.id, 'denied', new Date().toISOString().slice(0, 10))}>Deny</button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 'var(--space-3)', position: 'relative', padding: '0 var(--space-2)', maxWidth: 320 }}>
+                  <div style={{ position: 'absolute', left: '10%', right: '10%', top: 6, height: 1, background: 'var(--color-divider)' }} />
+                  {getSteps(a.status).map((s) => (
+                    <div key={s.label} className="ep-step">
+                      <div className={`ep-dot${s.state ? ' ' + s.state : ''}`} />
+                      <span style={{ fontSize: 11, fontWeight: s.state === 'current' ? 600 : 400, color: s.state === 'current' ? 'var(--color-accent-700)' : 'var(--color-neutral-600)' }}>{s.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-divider)' }}>
+                  {riskDraftId === a.id ? (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        className="input"
+                        placeholder="e.g. May delay Aug 5 rehab admission"
+                        value={riskDraftText}
+                        onChange={(e) => setRiskDraftText(e.target.value)}
+                        style={{ flex: 1 }}
+                        autoFocus
+                      />
+                      <button className="btn btn-primary" onClick={saveRiskNote}>Save</button>
+                      <button className="btn btn-secondary" onClick={() => setRiskDraftId(null)}>Cancel</button>
+                    </div>
+                  ) : a.at_risk_note ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span className="tag tag-accent">May affect care</span>
+                      <span style={{ fontSize: 13, flex: 1 }}>{a.at_risk_note}</span>
+                      <button className="btn btn-secondary" onClick={() => clearRiskNote(a.id)}>Clear flag</button>
+                    </div>
+                  ) : (
+                    <button className="btn btn-ghost" onClick={() => openRiskEditor(a)}>+ Flag delay risk to care team</button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
