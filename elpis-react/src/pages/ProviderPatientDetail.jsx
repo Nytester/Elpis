@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ProviderSidebar from '../components/ProviderSidebar.jsx';
 import { useProviderPatient } from '../hooks/useProviderPatient.js';
@@ -6,7 +7,27 @@ const SEVERITY_TAG = { Mild: 'tag-neutral', Moderate: 'tag-accent-2', Severe: 't
 
 export default function ProviderPatientDetail() {
   const { id } = useParams();
-  const { patient, symptoms, refillRequests, alert, loading, markRefillHandled } = useProviderPatient(id);
+  const { patient, symptoms, refillRequests, messages, sendMessage, alert, loading, markRefillHandled } = useProviderPatient(id);
+  const [draft, setDraft] = useState('');
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+  }, [messages]);
+
+  const handleSend = () => {
+    const text = draft.trim();
+    if (!text) return;
+    sendMessage(text);
+    setDraft('');
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   if (loading) {
     return (
@@ -99,6 +120,40 @@ export default function ProviderPatientDetail() {
               <Link className="btn btn-primary btn-block" to="/provider/inbox">Go to Inbox</Link>
             </div>
           </div>
+        </div>
+
+        <div className="card elev-sm" style={{ marginTop: 'var(--space-4)', display: 'flex', flexDirection: 'column' }}>
+          <span className="card-kicker">Messages</span>
+          <h4 className="card-title">Conversation with {patient.full_name}</h4>
+
+          <div ref={scrollRef} className="ep-msg-thread" style={{ maxHeight: 320 }}>
+            {messages.length === 0 && <p className="text-muted" style={{ fontSize: 13 }}>No messages yet.</p>}
+            {messages.map((m) => (
+              <div key={m.id} className={`ep-msg ${m.from === 'me' ? 'ep-msg-out' : 'ep-msg-in'}`}>
+                <div>{m.text}</div>
+                <div className="ep-msg-time">{m.time}</div>
+              </div>
+            ))}
+          </div>
+
+          {patient.profile_id ? (
+            <div className="ep-msg-input-row">
+              <textarea
+                className="input"
+                rows={1}
+                placeholder={`Message ${patient.full_name}...`}
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={handleKeyDown}
+                style={{ resize: 'none', flex: 1 }}
+              />
+              <button className="btn btn-primary" onClick={handleSend} disabled={!draft.trim()}>Send</button>
+            </div>
+          ) : (
+            <p className="text-muted" style={{ fontSize: 12, paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-divider)' }}>
+              This patient hasn't created an account yet — messaging isn't available until they sign up.
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar.jsx';
+import { usePatientData } from '../context/PatientDataContext.jsx';
 
 const CONTACTS = [
   {
     id: 'osei', initials: 'DR', name: 'Dr. Rina Osei', role: 'Oncologist',
-    messages: [
-      { from: 'them', text: "Hi Maya, I reviewed your latest labs — everything looks stable ahead of Cycle 4 tomorrow.", time: 'Mon 4:12 PM' },
-      { from: 'me', text: "Thank you Dr. Osei. Should I keep taking the Dexamethasone as scheduled?", time: 'Mon 4:20 PM' },
-      { from: 'them', text: "Yes, continue the same schedule. We'll reassess after infusion if the nausea is still an issue.", time: 'Mon 4:26 PM' },
-    ],
+    messages: [],
   },
   {
     id: 'tran', initials: 'JT', name: 'Jordan Tran, RN', role: 'Nurse Navigator',
@@ -30,16 +27,19 @@ const CONTACTS = [
 ];
 
 export default function CareTeam() {
+  const { messages: oseiMessages, sendMessage: sendOseiMessage } = usePatientData();
   const [searchParams] = useSearchParams();
   const requestedId = searchParams.get('contact');
   const initialId = CONTACTS.some((c) => c.id === requestedId) ? requestedId : CONTACTS[0].id;
 
   const [threads, setThreads] = useState(() =>
-    Object.fromEntries(CONTACTS.map((c) => [c.id, c.messages]))
+    Object.fromEntries(CONTACTS.filter((c) => c.id !== 'osei').map((c) => [c.id, c.messages]))
   );
   const [activeId, setActiveId] = useState(initialId);
   const [draft, setDraft] = useState('');
   const scrollRef = useRef(null);
+
+  const activeMessages = activeId === 'osei' ? oseiMessages : threads[activeId];
 
   useEffect(() => {
     if (CONTACTS.some((c) => c.id === requestedId)) setActiveId(requestedId);
@@ -47,25 +47,30 @@ export default function CareTeam() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [threads, activeId]);
+  }, [activeMessages, activeId]);
 
   const activeContact = CONTACTS.find((c) => c.id === activeId);
 
-  const sendMessage = () => {
+  const handleSend = () => {
     const text = draft.trim();
     if (!text) return;
-    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    setThreads((t) => ({
-      ...t,
-      [activeId]: [...t[activeId], { from: 'me', text, time: `Today ${time}` }],
-    }));
+
+    if (activeId === 'osei') {
+      sendOseiMessage(text);
+    } else {
+      const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      setThreads((t) => ({
+        ...t,
+        [activeId]: [...t[activeId], { from: 'me', text, time: `Today ${time}` }],
+      }));
+    }
     setDraft('');
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      handleSend();
     }
   };
 
@@ -112,8 +117,8 @@ export default function CareTeam() {
             </div>
 
             <div ref={scrollRef} className="ep-msg-thread">
-              {threads[activeId].map((m, i) => (
-                <div key={i} className={`ep-msg ${m.from === 'me' ? 'ep-msg-out' : 'ep-msg-in'}`}>
+              {activeMessages.map((m, i) => (
+                <div key={m.id ?? i} className={`ep-msg ${m.from === 'me' ? 'ep-msg-out' : 'ep-msg-in'}`}>
                   <div>{m.text}</div>
                   <div className="ep-msg-time">{m.time}</div>
                 </div>
@@ -130,7 +135,7 @@ export default function CareTeam() {
                 onKeyDown={handleKeyDown}
                 style={{ resize: 'none', flex: 1 }}
               />
-              <button className="btn btn-primary" onClick={sendMessage} disabled={!draft.trim()}>Send</button>
+              <button className="btn btn-primary" onClick={handleSend} disabled={!draft.trim()}>Send</button>
             </div>
           </div>
         </div>

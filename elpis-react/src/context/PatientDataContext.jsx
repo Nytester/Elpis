@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient.js';
 import { useAuth } from './AuthContext.jsx';
-import { formatRelativeDate } from '../lib/formatDate.js';
+import { formatRelativeDate, formatMessageTime } from '../lib/formatDate.js';
 
 const PatientDataContext = createContext(null);
 
@@ -15,16 +15,27 @@ function mapSymptoms(rows) {
   }));
 }
 
+function mapMessages(rows, myId) {
+  return rows.map((r) => ({
+    id: r.id,
+    from: r.author_id === myId ? 'me' : 'them',
+    text: r.body,
+    time: formatMessageTime(r.created_at),
+  }));
+}
+
 export function PatientDataProvider({ children }) {
   const { session } = useAuth();
   const [patientId, setPatientId] = useState(null);
   const [symptoms, setSymptoms] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   // Resolve the logged-in user's own patients.id row
   useEffect(() => {
     if (!session) {
       setPatientId(null);
       setSymptoms([]);
+      setMessages([]);
       return;
     }
     supabase.from('patients').select('id').eq('profile_id', session.user.id).single()
@@ -57,6 +68,37 @@ export function PatientDataProvider({ children }) {
     };
   }, [patientId]);
 
+  // Load + realtime-subscribe to this patient's own message thread
+  useEffect(() => {
+    if (!patientId || !session) return;
+
+    let active = true;
+    const load = () => {
+      supabase
+        .from('messages')
+        .select('*')
+        .eq('patient_id', patientId)
+        .order('created_at', { ascending: true })
+        .then(({ data }) => { if (active) setMessages(mapMessages(data ?? [], session.user.id)); });
+    };
+    load();
+
+    const channel = supabase
+      .channel(`messages-${patientId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `patient_id=eq.${patientId}` }, load)
+      .subscribe();
+
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [patientId, session]);
+
+  const sendMessage = useCallback(async (body) => {
+    if (!patientId || !session) return;
+    await supabase.from('messages').insert({ patient_id: patientId, author_id: session.user.id, body });
+  }, [patientId, session]);
+
   const logSymptom = useCallback(async ({ symptom, severity, notes }) => {
     if (!patientId) return;
     await supabase.from('symptoms').insert({ patient_id: patientId, symptom, severity, notes });
@@ -68,7 +110,7 @@ export function PatientDataProvider({ children }) {
   }, [patientId]);
 
   return (
-    <PatientDataContext.Provider value={{ symptoms, logSymptom, requestRefill }}>
+    <PatientDataContext.Provider value={{ symptoms, logSymptom, requestRefill, messages, sendMessage }}>
       {children}
     </PatientDataContext.Provider>
   );
