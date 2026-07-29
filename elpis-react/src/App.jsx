@@ -13,6 +13,7 @@ import ForgotPassword from './pages/ForgotPassword.jsx';
 import ClaimInvite from './pages/ClaimInvite.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import CareTeam from './pages/CareTeam.jsx';
+import Hope from './pages/Hope.jsx';
 import Resources from './pages/Resources.jsx';
 import Documents from './pages/Documents.jsx';
 import Medications from './pages/Medications.jsx';
@@ -44,6 +45,7 @@ export default function App() {
 
           <Route path="/dashboard" element={<RequireRole roles={PATIENT_ROLES}><Dashboard /></RequireRole>} />
           <Route path="/dashboard/care-team" element={<RequireRole roles={PATIENT_ROLES}><CareTeam /></RequireRole>} />
+          <Route path="/dashboard/hope" element={<RequireRole roles={PATIENT_ROLES}><Hope /></RequireRole>} />
           <Route path="/dashboard/resources" element={<RequireRole roles={PATIENT_ROLES}><Resources /></RequireRole>} />
           <Route path="/dashboard/documents" element={<RequireRole roles={PATIENT_ROLES}><Documents /></RequireRole>} />
           <Route path="/dashboard/medications" element={<RequireRole roles={PATIENT_ROLES}><Medications /></RequireRole>} />
