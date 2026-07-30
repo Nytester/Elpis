@@ -5,6 +5,8 @@ import RequireRole from './components/RequireRole.jsx';
 import Landing from './pages/Landing.jsx';
 import About from './pages/About.jsx';
 import Prevention from './pages/Prevention.jsx';
+import Blog from './pages/Blog.jsx';
+import BlogPost from './pages/BlogPost.jsx';
 import Pricing from './pages/Pricing.jsx';
 import Contact from './pages/Contact.jsx';
 import Login from './pages/Login.jsx';
@@ -14,6 +16,7 @@ import ClaimInvite from './pages/ClaimInvite.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import CareTeam from './pages/CareTeam.jsx';
 import Hope from './pages/Hope.jsx';
+import Transportation from './pages/Transportation.jsx';
 import Resources from './pages/Resources.jsx';
 import Documents from './pages/Documents.jsx';
 import Medications from './pages/Medications.jsx';
@@ -36,6 +39,8 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/about" element={<About />} />
           <Route path="/prevention" element={<Prevention />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
@@ -46,6 +51,7 @@ export default function App() {
           <Route path="/dashboard" element={<RequireRole roles={PATIENT_ROLES}><Dashboard /></RequireRole>} />
           <Route path="/dashboard/care-team" element={<RequireRole roles={PATIENT_ROLES}><CareTeam /></RequireRole>} />
           <Route path="/dashboard/hope" element={<RequireRole roles={PATIENT_ROLES}><Hope /></RequireRole>} />
+          <Route path="/dashboard/transportation" element={<RequireRole roles={PATIENT_ROLES}><Transportation /></RequireRole>} />
           <Route path="/dashboard/resources" element={<RequireRole roles={PATIENT_ROLES}><Resources /></RequireRole>} />
           <Route path="/dashboard/documents" element={<RequireRole roles={PATIENT_ROLES}><Documents /></RequireRole>} />
           <Route path="/dashboard/medications" element={<RequireRole roles={PATIENT_ROLES}><Medications /></RequireRole>} />

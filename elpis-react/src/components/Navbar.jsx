@@ -10,6 +10,7 @@ export default function Navbar() {
       <Link to="/" aria-current={current('/')}>Home</Link>
       <Link to="/about" aria-current={current('/about')}>About</Link>
       <Link to="/prevention" aria-current={current('/prevention')}>Prevention</Link>
+      <Link to="/blog" aria-current={pathname.startsWith('/blog') ? 'page' : undefined}>Blog</Link>
       <Link to="/pricing" aria-current={current('/pricing')}>Pricing</Link>
       <Link to="/contact" aria-current={current('/contact')}>Contact</Link>
       <div style={{ display: 'flex', gap: 'var(--space-2)', marginLeft: 'var(--space-4)' }}>
