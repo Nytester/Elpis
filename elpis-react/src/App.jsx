@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { PatientDataProvider } from './context/PatientDataContext.jsx';
 import RequireRole from './components/RequireRole.jsx';
 import Landing from './pages/Landing.jsx';
+import HospitalFinder from './pages/HospitalFinder.jsx';
 import About from './pages/About.jsx';
 import Prevention from './pages/Prevention.jsx';
 import Blog from './pages/Blog.jsx';
@@ -37,6 +38,7 @@ export default function App() {
       <PatientDataProvider>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/hospital-finder" element={<HospitalFinder />} />
           <Route path="/about" element={<About />} />
           <Route path="/prevention" element={<Prevention />} />
           <Route path="/blog" element={<Blog />} />

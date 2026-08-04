@@ -66,6 +66,13 @@ export default function Landing() {
             <p className="card-body">Financial assistance, transportation programs and telehealth options — because care shouldn't stop at the parking lot.</p>
             <span className="tag tag-neutral">Built for rural &amp; underserved access</span>
           </div>
+          <div className="card elev-sm">
+            <span className="card-kicker">Locations</span>
+            <h4 className="card-title">Hospital Finder</h4>
+            <p className="card-body">Search any zip code to find nearby hospitals and cancer treatment centers, sorted by distance, on an interactive map.</p>
+            <span className="tag tag-accent">No account needed</span>
+            <Link to="/hospital-finder" style={{ fontSize: 13, marginTop: 'var(--space-1)' }}>Try it now →</Link>
+          </div>
         </div>
       </div>
 

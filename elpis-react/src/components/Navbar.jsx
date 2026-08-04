@@ -8,6 +8,7 @@ export default function Navbar() {
     <div className="nav" style={{ paddingLeft: 'var(--space-6)', paddingRight: 'var(--space-6)' }}>
       <Link to="/" className="nav-brand ep-logo">Elpis</Link>
       <Link to="/" aria-current={current('/')}>Home</Link>
+      <Link to="/hospital-finder" aria-current={current('/hospital-finder')}>Hospital Finder</Link>
       <Link to="/about" aria-current={current('/about')}>About</Link>
       <Link to="/prevention" aria-current={current('/prevention')}>Prevention</Link>
       <Link to="/blog" aria-current={pathname.startsWith('/blog') ? 'page' : undefined}>Blog</Link>
