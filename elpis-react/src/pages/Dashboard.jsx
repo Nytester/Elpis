@@ -58,7 +58,7 @@ function monthGrid(date) {
 
 export default function Dashboard() {
   const [meds, setMeds] = useState(INITIAL_MEDS);
-  const { symptoms, authorizations, appointments } = usePatientData();
+  const { symptoms, authorizations, appointments, homeZip } = usePatientData();
   const { profile } = useAuth();
   const firstName = profile?.full_name?.split(' ')[0] ?? '';
   const now = useClock();
@@ -90,6 +90,16 @@ export default function Dashboard() {
               <span className="gl-tag gl-tag-accent" style={{ marginBottom: 6 }}>May affect your care</span>
               <div style={{ fontSize: 14, fontWeight: 500, marginTop: 6 }}>{atRiskAuth.procedure} authorization: {atRiskAuth.at_risk_note}</div>
               <Link className="gl-pill" style={{ marginTop: 10, display: 'inline-flex' }} to="/dashboard/insurance">View insurance status</Link>
+            </div>
+          )}
+
+          {homeZip === null && (
+            <div className="gl-panel" style={{ padding: 16, marginBottom: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Add your zip code</div>
+                <div style={{ fontSize: 12.5, color: 'rgba(34,48,43,.6)', marginTop: 2 }}>So Transportation can default to your area instead of asking every time.</div>
+              </div>
+              <Link className="gl-pill gl-pill-primary" style={{ border: 'none' }} to="/dashboard/settings">Add zip code</Link>
             </div>
           )}
 

@@ -202,8 +202,8 @@ function GlobeMap({ patientCoords, hospitals, radius, hoveredId, onHover, zip })
 // (Transportation.jsx, wrapped in Sidebar) and on the public, no-login
 // Hospital Finder page (pages/HospitalFinder.jsx, wrapped in Navbar/Footer).
 // One implementation, two shells, so a fix here applies everywhere.
-export default function HospitalFinderPanel({ title = 'Hospital Finder' }) {
-  const [zip, setZip] = useState('');
+export default function HospitalFinderPanel({ title = 'Hospital Finder', defaultZip = '' }) {
+  const [zip, setZip] = useState(defaultZip);
   const [radius, setRadius] = useState(75);
   const [allNearby, setAllNearby] = useState(null); // unfiltered, sorted by distance
   const [searchedZip, setSearchedZip] = useState('');
@@ -212,6 +212,15 @@ export default function HospitalFinderPanel({ title = 'Hospital Finder' }) {
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState('');
   const hospitalCoordsRef = useRef(null);
+
+  // defaultZip (the patient's saved home zip) often isn't known yet on first
+  // render — it loads async from Supabase. Fill it in once it arrives, but
+  // only if the zip field is still untouched and empty, so it never clobbers
+  // something the user already typed.
+  useEffect(() => {
+    if (defaultZip && !zip) setZip(defaultZip);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultZip]);
 
   // Radius is applied client-side against the already-geocoded list, so
   // dragging the slider updates results live without a new search.

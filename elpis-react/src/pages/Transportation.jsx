@@ -1,5 +1,6 @@
 import Sidebar from '../components/Sidebar.jsx';
 import HospitalFinderPanel from '../components/HospitalFinderPanel.jsx';
+import { usePatientData } from '../context/PatientDataContext.jsx';
 import './dashboardGlass.css';
 
 // HospitalFinderPanel is shared with the public, no-login /hospital-finder
@@ -9,12 +10,13 @@ import './dashboardGlass.css';
 // property overrides in dashboardGlass.css, without touching the shared
 // component or affecting the public page (which never gets that wrapper).
 export default function Transportation() {
+  const { homeZip } = usePatientData();
   return (
     <div className="ep-shell-dash gl-shell">
       <Sidebar active="Transportation" />
       <div className="ep-main">
         <div className="gl-dash">
-          <HospitalFinderPanel title="Transportation" />
+          <HospitalFinderPanel title="Transportation" defaultZip={homeZip ?? ''} />
         </div>
       </div>
     </div>

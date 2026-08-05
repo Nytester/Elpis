@@ -1,6 +1,52 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar.jsx';
+import { usePatientData } from '../context/PatientDataContext.jsx';
 import './dashboardGlass.css';
+
+// Real, self-reported home zip — used to default the Transportation search
+// instead of asking every time. Independent of how the patient logged in
+// (works today with email/password, will keep working once Google auth is
+// added, since it only needs the existing session).
+function HomeZipCard() {
+  const { homeZip, setHomeZip } = usePatientData();
+  const [zip, setZip] = useState('');
+  const [saved, setSaved] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { setZip(homeZip ?? ''); }, [homeZip]);
+
+  const save = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    const { error } = await setHomeZip(zip.trim());
+    setSaving(false);
+    if (!error) {
+      setSaved('Saved');
+      setTimeout(() => setSaved(''), 2000);
+    }
+  };
+
+  return (
+    <form onSubmit={save} className="gl-panel" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <span className="gl-kicker">Location</span>
+      <div style={{ fontSize: 15, fontWeight: 600 }}>Home zip code</div>
+      <p style={{ fontSize: 12.5, color: 'rgba(34,48,43,.6)', margin: 0 }}>Used to default Transportation searches to your own area, so you're not typing it in every time.</p>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 4 }}>
+        <input
+          className="gl-input"
+          value={zip}
+          onChange={(e) => setZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
+          placeholder="e.g. 70115"
+          inputMode="numeric"
+          maxLength={5}
+          style={{ width: 140 }}
+        />
+        <button type="submit" className="gl-pill gl-pill-primary" style={{ border: 'none' }} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+        {saved && <span className="gl-tag">{saved}</span>}
+      </div>
+    </form>
+  );
+}
 
 // .ep-switch/.ep-setting-row/.ep-avatar are reused unchanged — they're
 // already driven entirely by var(--color-*) tokens, which .gl-dash
@@ -95,6 +141,8 @@ export default function Settings() {
                 {saved && <span className="gl-tag">Saved</span>}
               </div>
             </form>
+
+            <HomeZipCard />
 
             {/* Notifications */}
             <div className="gl-panel" style={{ padding: 18 }}>

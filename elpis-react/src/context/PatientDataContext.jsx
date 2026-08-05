@@ -31,8 +31,10 @@ export function PatientDataProvider({ children }) {
   const [messages, setMessages] = useState([]);
   const [authorizations, setAuthorizations] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [homeZip, setHomeZipState] = useState(null);
 
-  // Resolve the logged-in user's own patients.id row
+  // Resolve the logged-in user's own patients.id row (and home_zip, in the
+  // same query — it lives on the same row)
   useEffect(() => {
     if (!session) {
       setPatientId(null);
@@ -40,10 +42,14 @@ export function PatientDataProvider({ children }) {
       setMessages([]);
       setAuthorizations([]);
       setAppointments([]);
+      setHomeZipState(null);
       return;
     }
-    supabase.from('patients').select('id').eq('profile_id', session.user.id).single()
-      .then(({ data }) => setPatientId(data?.id ?? null));
+    supabase.from('patients').select('id, home_zip').eq('profile_id', session.user.id).single()
+      .then(({ data }) => {
+        setPatientId(data?.id ?? null);
+        setHomeZipState(data?.home_zip ?? null);
+      });
   }, [session]);
 
   // Load + realtime-subscribe to this patient's own symptoms
@@ -167,8 +173,14 @@ export function PatientDataProvider({ children }) {
     await supabase.from('refill_requests').insert({ patient_id: patientId, medication_name: medicationName });
   }, [patientId]);
 
+  const setHomeZip = useCallback(async (zip) => {
+    const { error } = await supabase.rpc('update_patient_home_zip', { new_zip: zip || null });
+    if (!error) setHomeZipState(zip || null);
+    return { error };
+  }, []);
+
   return (
-    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations, appointments }}>
+    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations, appointments, homeZip, setHomeZip }}>
       {children}
     </PatientDataContext.Provider>
   );
