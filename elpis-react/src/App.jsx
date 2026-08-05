@@ -24,6 +24,7 @@ import Documents from './pages/Documents.jsx';
 import Medications from './pages/Medications.jsx';
 import Symptoms from './pages/Symptoms.jsx';
 import Journey from './pages/Journey.jsx';
+import Appointments from './pages/Appointments.jsx';
 import AiAssistant from './pages/AiAssistant.jsx';
 import Settings from './pages/Settings.jsx';
 import Insurance from './pages/Insurance.jsx';
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/dashboard/medications" element={<RequireRole roles={PATIENT_ROLES}><Medications /></RequireRole>} />
           <Route path="/dashboard/symptoms" element={<RequireRole roles={PATIENT_ROLES}><Symptoms /></RequireRole>} />
           <Route path="/dashboard/journey" element={<RequireRole roles={PATIENT_ROLES}><Journey /></RequireRole>} />
+          <Route path="/dashboard/appointments" element={<RequireRole roles={PATIENT_ROLES}><Appointments /></RequireRole>} />
           <Route path="/dashboard/assistant" element={<RequireRole roles={PATIENT_ROLES}><AiAssistant /></RequireRole>} />
           <Route path="/dashboard/settings" element={<RequireRole roles={PATIENT_ROLES}><Settings /></RequireRole>} />
           <Route path="/dashboard/insurance" element={<RequireRole roles={PATIENT_ROLES}><Insurance /></RequireRole>} />

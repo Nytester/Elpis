@@ -11,7 +11,7 @@ const NAV_ITEMS = [
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4" /></svg>,
   },
   {
-    label: 'Appointments', href: '#',
+    label: 'Appointments', href: '/dashboard/appointments',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>,
   },
   {
@@ -69,29 +69,34 @@ export default function Sidebar({ active }) {
 
   return (
     <div className="ep-sidebar">
-      <Link to="/" className="ep-logo" style={{ padding: '0 10px', marginBottom: 'var(--space-4)', textDecoration: 'none', fontSize: 22 }}>Elpis</Link>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Link to="/" className="ep-navitem" style={{ marginBottom: 'var(--space-4)' }} aria-label="Elpis home">
+        <span className="ep-logo" style={{ fontSize: 20 }}>E</span>
+        <span className="ep-navlabel">Elpis</span>
+      </Link>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {NAV_ITEMS.map(({ label, href, icon }) => (
           href === '#' ? (
             <a key={label} className={`ep-navitem${active === label ? ' active' : ''}`} href={href}>
               {icon}
-              <span>{label}</span>
+              <span className="ep-navlabel">{label}</span>
             </a>
           ) : (
             <Link key={label} className={`ep-navitem${active === label ? ' active' : ''}`} to={href}>
               {icon}
-              <span>{label}</span>
+              <span className="ep-navlabel">{label}</span>
             </Link>
           )
         ))}
       </div>
-      <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, padding: 10, borderTop: '1px solid var(--color-divider)' }}>
-        <div className="ep-avatar">{initials}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600 }}>{profile?.full_name}</div>
-          <div style={{ fontSize: 11, color: 'var(--color-neutral-600)', textTransform: 'capitalize' }}>{profile?.role}</div>
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-divider)' }}>
+        <div className="ep-navitem" style={{ cursor: 'default' }}>
+          <div className="ep-avatar">{initials}</div>
+          <span className="ep-navlabel">{profile?.full_name}{profile?.role ? ` · ${profile.role}` : ''}</span>
         </div>
-        <a href="/" onClick={handleLogout} style={{ fontSize: 12, color: 'var(--color-neutral-600)', cursor: 'pointer' }}>Log out</a>
+        <a href="/" onClick={handleLogout} className="ep-navitem" aria-label="Log out">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+          <span className="ep-navlabel">Log out</span>
+        </a>
       </div>
     </div>
   );

@@ -5,18 +5,57 @@ import { useProviderPatient } from '../hooks/useProviderPatient.js';
 import { getSteps } from '../lib/authorizationSteps.js';
 
 const SEVERITY_TAG = { Mild: 'tag-neutral', Moderate: 'tag-accent-2', Severe: 'tag-accent' };
+const APPT_STATUS_TAG = { scheduled: 'tag-accent', completed: 'tag-neutral', cancelled: 'tag-accent-2' };
+
+function toLocalInputValue(iso) {
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 export default function ProviderPatientDetail() {
   const { id } = useParams();
   const {
     patient, symptoms, refillRequests, messages, sendMessage, alert, loading, markRefillHandled,
     authorizations, addAuthorization, updateAuthorizationStatus, setRiskNote,
+    appointments, addAppointment, updateAppointmentStatus, rescheduleAppointment,
   } = useProviderPatient(id);
   const [draft, setDraft] = useState('');
   const scrollRef = useRef(null);
   const [newProcedure, setNewProcedure] = useState('');
   const [riskDraftId, setRiskDraftId] = useState(null);
   const [riskDraftText, setRiskDraftText] = useState('');
+
+  const [showApptForm, setShowApptForm] = useState(false);
+  const [apptType, setApptType] = useState('');
+  const [apptWhen, setApptWhen] = useState('');
+  const [apptLocation, setApptLocation] = useState('');
+  const [rescheduleId, setRescheduleId] = useState(null);
+  const [rescheduleWhen, setRescheduleWhen] = useState('');
+  const [rescheduleLocation, setRescheduleLocation] = useState('');
+
+  const handleAddAppointment = (e) => {
+    e.preventDefault();
+    const type = apptType.trim();
+    if (!type || !apptWhen) return;
+    addAppointment({ type, scheduledAt: new Date(apptWhen).toISOString(), location: apptLocation.trim() });
+    setApptType('');
+    setApptWhen('');
+    setApptLocation('');
+    setShowApptForm(false);
+  };
+
+  const openReschedule = (a) => {
+    setRescheduleId(a.id);
+    setRescheduleWhen(toLocalInputValue(a.scheduled_at));
+    setRescheduleLocation(a.location ?? '');
+  };
+
+  const saveReschedule = () => {
+    if (!rescheduleWhen) return;
+    rescheduleAppointment(rescheduleId, new Date(rescheduleWhen).toISOString(), rescheduleLocation.trim());
+    setRescheduleId(null);
+  };
 
   const handleAddAuthorization = (e) => {
     e.preventDefault();
@@ -106,11 +145,6 @@ export default function ProviderPatientDetail() {
         <div className="ep-grid">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <div className="card elev-sm">
-              <span className="card-kicker">Next appointment</span>
-              <h4 className="card-title">{patient.next_appointment_note}</h4>
-            </div>
-
-            <div className="card elev-sm">
               <span className="card-kicker">Recent symptoms</span>
               <h4 className="card-title">Symptom log</h4>
               <div style={{ display: 'flex', flexDirection: 'column', marginTop: 4 }}>
@@ -150,6 +184,75 @@ export default function ProviderPatientDetail() {
               <h4 className="card-title">Assigned provider</h4>
               <Link className="btn btn-primary btn-block" to="/provider/inbox">Go to Inbox</Link>
             </div>
+          </div>
+        </div>
+
+        <div className="card elev-sm" style={{ marginTop: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span className="card-kicker">Appointments</span>
+            <button className="btn btn-secondary" type="button" onClick={() => setShowApptForm((s) => !s)}>+ Schedule appointment</button>
+          </div>
+          <h4 className="card-title">Upcoming &amp; past visits</h4>
+
+          {showApptForm && (
+            <form onSubmit={handleAddAppointment} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-2)' }}>
+              <input
+                className="input"
+                placeholder="Type, e.g. Chemotherapy Infusion — Cycle 5"
+                value={apptType}
+                onChange={(e) => setApptType(e.target.value)}
+                style={{ flex: 2, minWidth: 220 }}
+                autoFocus
+              />
+              <input
+                className="input"
+                type="datetime-local"
+                value={apptWhen}
+                onChange={(e) => setApptWhen(e.target.value)}
+                style={{ flex: 1, minWidth: 180 }}
+              />
+              <input
+                className="input"
+                placeholder="Location (optional)"
+                value={apptLocation}
+                onChange={(e) => setApptLocation(e.target.value)}
+                style={{ flex: 1, minWidth: 160 }}
+              />
+              <button type="submit" className="btn btn-primary" disabled={!apptType.trim() || !apptWhen}>Schedule</button>
+            </form>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
+            {appointments.length === 0 && <p className="text-muted" style={{ fontSize: 13 }}>No appointments scheduled yet.</p>}
+            {appointments.map((a) => (
+              <div key={a.id} style={{ padding: 'var(--space-3)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{a.type}</div>
+                    <div className="text-muted" style={{ fontSize: 11 }}>
+                      {new Date(a.scheduled_at).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                      {a.location ? ` · ${a.location}` : ''}
+                    </div>
+                  </div>
+                  <span className={`tag ${APPT_STATUS_TAG[a.status]}`}>{a.status}</span>
+                </div>
+
+                {rescheduleId === a.id ? (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-divider)' }}>
+                    <input className="input" type="datetime-local" value={rescheduleWhen} onChange={(e) => setRescheduleWhen(e.target.value)} style={{ flex: 1, minWidth: 180 }} />
+                    <input className="input" placeholder="Location" value={rescheduleLocation} onChange={(e) => setRescheduleLocation(e.target.value)} style={{ flex: 1, minWidth: 160 }} />
+                    <button className="btn btn-primary" onClick={saveReschedule} disabled={!rescheduleWhen}>Save</button>
+                    <button className="btn btn-secondary" onClick={() => setRescheduleId(null)}>Cancel</button>
+                  </div>
+                ) : a.status === 'scheduled' && (
+                  <div style={{ display: 'flex', gap: 8, marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-divider)' }}>
+                    <button className="btn btn-secondary" onClick={() => openReschedule(a)}>Reschedule</button>
+                    <button className="btn btn-secondary" onClick={() => updateAppointmentStatus(a.id, 'completed')}>Mark completed</button>
+                    <button className="btn btn-ghost" onClick={() => updateAppointmentStatus(a.id, 'cancelled')}>Cancel</button>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 

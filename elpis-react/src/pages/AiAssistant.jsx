@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Sidebar from '../components/Sidebar.jsx';
+import './dashboardGlass.css';
 
 const QUICK_PROMPTS = [
   "What's my next appointment?",
@@ -86,53 +87,55 @@ export default function AiAssistant() {
   };
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <Sidebar active="AI Assistant" />
 
       <div className="ep-main" style={{ display: 'flex', flexDirection: 'column', height: '100vh', boxSizing: 'border-box' }}>
-        <div style={{ marginBottom: 'var(--space-6)' }}>
-          <h1 style={{ fontSize: 30, fontWeight: 400 }}>AI Assistant</h1>
-          <p className="text-muted" style={{ fontSize: 13, marginTop: 2 }}>Ask about symptoms, meds, or what's next — grounded in your own chart.</p>
-        </div>
-
-        <div className="card elev-sm" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: 'var(--space-3)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 'var(--space-2)', borderBottom: '1px solid var(--color-divider)' }}>
-            <div className="ep-avatar" style={{ background: 'var(--color-accent)', color: 'white' }}>
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.5 8.5 0 1 1-4-7.2" /><path d="M21 4v6h-6" /></svg>
-            </div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>Elpis Assistant</div>
-              <div className="text-muted" style={{ fontSize: 11 }}>Grounded in your chart</div>
-            </div>
+        <div className="gl-dash" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ marginBottom: 20 }}>
+            <h1 className="gl-greeting">AI Assistant</h1>
+            <p style={{ fontSize: 13, color: 'rgba(34,48,43,.55)', marginTop: 4 }}>Ask about symptoms, meds, or what's next — grounded in your own chart.</p>
           </div>
 
-          <div ref={scrollRef} className="ep-msg-thread">
-            {messages.map((m, i) => (
-              <div key={i} className={`ep-msg ${m.from === 'me' ? 'ep-msg-out' : 'ep-msg-in'}`}>
-                <div>{m.text}</div>
-                <div className="ep-msg-time">{m.time}</div>
+          <div className="gl-panel" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 10, borderBottom: '1px solid rgba(34,48,43,.1)' }}>
+              <div className="gl-avatar" style={{ width: 34, height: 34, fontSize: 12, background: '#1d7a5f' }}>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.5 8.5 0 1 1-4-7.2" /><path d="M21 4v6h-6" /></svg>
               </div>
-            ))}
-            {typing && <div className="ep-msg ep-msg-in" style={{ fontStyle: 'italic', color: 'var(--color-neutral-600)' }}>Elpis is typing…</div>}
-          </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Elpis Assistant</div>
+                <div style={{ fontSize: 11, color: 'rgba(34,48,43,.55)' }}>Grounded in your chart</div>
+              </div>
+            </div>
 
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: 'var(--space-2) 0' }}>
-            {QUICK_PROMPTS.map((p) => (
-              <button key={p} className="ep-chip" onClick={() => send(p)}>{p}</button>
-            ))}
-          </div>
+            <div ref={scrollRef} style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', flex: 1, padding: '12px 4px' }}>
+              {messages.map((m, i) => (
+                <div key={i} className={`gl-msg ${m.from === 'me' ? 'gl-msg-out' : 'gl-msg-in'}`}>
+                  <div>{m.text}</div>
+                  <div className="gl-msg-time">{m.time}</div>
+                </div>
+              ))}
+              {typing && <div className="gl-msg gl-msg-in" style={{ fontStyle: 'italic', color: 'rgba(34,48,43,.55)' }}>Elpis is typing…</div>}
+            </div>
 
-          <div className="ep-msg-input-row">
-            <textarea
-              className="input"
-              rows={1}
-              placeholder="Ask Elpis..."
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={handleKeyDown}
-              style={{ resize: 'none', flex: 1 }}
-            />
-            <button className="btn btn-primary" onClick={() => send(draft)} disabled={!draft.trim()}>Send</button>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '10px 0' }}>
+              {QUICK_PROMPTS.map((p) => (
+                <button key={p} className="gl-chip" onClick={() => send(p)}>{p}</button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', paddingTop: 12, borderTop: '1px solid rgba(34,48,43,.1)' }}>
+              <textarea
+                className="gl-input"
+                rows={1}
+                placeholder="Ask Elpis..."
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={handleKeyDown}
+                style={{ resize: 'none', flex: 1 }}
+              />
+              <button className="gl-pill gl-pill-primary" onClick={() => send(draft)} disabled={!draft.trim()} style={{ border: 'none', opacity: draft.trim() ? 1 : .5, padding: '10px 20px' }}>Send</button>
+            </div>
           </div>
         </div>
       </div>

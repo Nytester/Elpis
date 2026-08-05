@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import Sidebar from '../components/Sidebar.jsx';
+import './dashboardGlass.css';
 
 const CATEGORIES = ['Lab Results', 'Imaging', 'Visit Summaries', 'Insurance & Billing', 'Consent Forms'];
 
 const TAG_CLASS = {
-  'Lab Results': 'tag-accent',
-  'Imaging': 'tag-accent-2',
-  'Visit Summaries': 'tag-outline',
-  'Insurance & Billing': 'tag-neutral',
-  'Consent Forms': 'tag-neutral',
+  'Lab Results': 'gl-tag-accent',
+  'Imaging': 'gl-tag-purple',
+  'Visit Summaries': 'gl-tag-outline',
+  'Insurance & Billing': 'gl-tag-mild',
+  'Consent Forms': 'gl-tag-mild',
 };
 
 const INITIAL_DOCS = [
@@ -47,71 +48,73 @@ export default function Documents() {
   };
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <Sidebar active="Documents" />
 
       <div className="ep-main">
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 'var(--space-6)' }}>
-          <div>
-            <h1 style={{ fontSize: 30, fontWeight: 400 }}>Documents</h1>
-            <p className="text-muted" style={{ fontSize: 13, marginTop: 2 }}>Lab results, imaging, visit summaries, and forms — all in one place.</p>
+        <div className="gl-dash">
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 20 }}>
+            <div>
+              <h1 className="gl-greeting">Documents</h1>
+              <p style={{ fontSize: 13, color: 'rgba(34,48,43,.55)', marginTop: 4 }}>Lab results, imaging, visit summaries, and forms — all in one place.</p>
+            </div>
+            <button className="gl-pill gl-pill-primary" style={{ border: 'none' }} onClick={() => setShowUpload((s) => !s)}>+ Upload document</button>
           </div>
-          <button className="btn btn-primary" onClick={() => setShowUpload((s) => !s)}>+ Upload document</button>
-        </div>
 
-        {showUpload && (
-          <form onSubmit={handleUpload} className="card elev-sm" style={{ marginBottom: 'var(--space-4)', gap: 'var(--space-3)' }}>
-            <span className="card-kicker">New document</span>
-            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-              <input
-                className="input"
-                placeholder="Document name"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                style={{ flex: 2, minWidth: 200 }}
-                autoFocus
-              />
-              <select className="input" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} style={{ flex: 1, minWidth: 160 }}>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <button type="submit" className="btn btn-primary" disabled={!newName.trim()}>Add</button>
-              <button type="button" className="btn btn-secondary" onClick={() => setShowUpload(false)}>Cancel</button>
-            </div>
-          </form>
-        )}
-
-        <div className="seg" style={{ marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
-          {['All', ...CATEGORIES].map((cat) => (
-            <span
-              key={cat}
-              className={`seg-opt${activeCategory === cat ? ' selected' : ''}`}
-              onClick={() => setActiveCategory(cat)}
-            >
-              {cat}
-            </span>
-          ))}
-        </div>
-
-        <div className="card elev-sm" style={{ padding: 'var(--space-2) var(--space-3)' }}>
-          {visibleDocs.length === 0 && (
-            <p className="text-muted" style={{ fontSize: 13, padding: 'var(--space-3) 0' }}>No documents in this category yet.</p>
-          )}
-          {visibleDocs.map((doc) => (
-            <div key={doc.id} className="ep-doc-row">
-              <div className="ep-doc-icon"><DocIcon /></div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14 }}>{doc.name}</div>
-                <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>{doc.date} · {doc.by} · {doc.size}</div>
+          {showUpload && (
+            <form onSubmit={handleUpload} className="gl-panel" style={{ padding: 16, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <span className="gl-kicker">New document</span>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <input
+                  className="gl-input"
+                  placeholder="Document name"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  style={{ flex: 2, minWidth: 200 }}
+                  autoFocus
+                />
+                <select className="gl-input" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} style={{ flex: 1, minWidth: 160 }}>
+                  {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <button type="submit" className="gl-pill gl-pill-primary" style={{ border: 'none' }} disabled={!newName.trim()}>Add</button>
+                <button type="button" className="gl-pill" onClick={() => setShowUpload(false)}>Cancel</button>
               </div>
-              <span className={`tag ${TAG_CLASS[doc.category]}`}>{doc.category}</span>
-              <a className="btn btn-icon btn-ghost" href="#" aria-label={`View ${doc.name}`}>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" /><circle cx="12" cy="12" r="3" /></svg>
-              </a>
-              <a className="btn btn-icon btn-ghost" href="#" aria-label={`Download ${doc.name}`}>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" /></svg>
-              </a>
-            </div>
-          ))}
+            </form>
+          )}
+
+          <div className="gl-seg" style={{ marginBottom: 16, flexWrap: 'wrap' }}>
+            {['All', ...CATEGORIES].map((cat) => (
+              <span
+                key={cat}
+                className={`gl-seg-opt${activeCategory === cat ? ' selected' : ''}`}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+
+          <div className="gl-panel" style={{ padding: '4px 16px' }}>
+            {visibleDocs.length === 0 && (
+              <p style={{ fontSize: 13, color: 'rgba(34,48,43,.55)', padding: '14px 0' }}>No documents in this category yet.</p>
+            )}
+            {visibleDocs.map((doc, i) => (
+              <div key={doc.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderTop: i === 0 ? 'none' : '1px solid rgba(34,48,43,.08)' }}>
+                <div style={{ width: 36, height: 36, flex: 'none', borderRadius: 10, background: 'rgba(29,122,95,.12)', color: '#1d7a5f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><DocIcon /></div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14 }}>{doc.name}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(34,48,43,.55)', marginTop: 2 }}>{doc.date} · {doc.by} · {doc.size}</div>
+                </div>
+                <span className={`gl-tag ${TAG_CLASS[doc.category]}`}>{doc.category}</span>
+                <a className="gl-pill" style={{ width: 32, height: 32, padding: 0, borderRadius: '50%' }} href="#" aria-label={`View ${doc.name}`}>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" /><circle cx="12" cy="12" r="3" /></svg>
+                </a>
+                <a className="gl-pill" style={{ width: 32, height: 32, padding: 0, borderRadius: '50%' }} href="#" aria-label={`Download ${doc.name}`}>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" /></svg>
+                </a>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

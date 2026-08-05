@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar.jsx';
 import { useHope } from '../hooks/useHope.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { formatRelativeDate } from '../lib/formatDate.js';
+import './dashboardGlass.css';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -326,12 +327,13 @@ export default function Hope() {
   };
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <Sidebar active="Hope" />
 
-      <div className="ep-main" style={{ maxWidth: 720, marginInline: 'auto' }}>
+      <div className="ep-main">
+       <div className="gl-dash" style={{ maxWidth: 720, marginInline: 'auto' }}>
         <div style={{ marginBottom: 'var(--space-5)' }}>
-          <h1 style={{ fontSize: 32, fontWeight: 400 }}>Hope</h1>
+          <h1 className="gl-greeting" style={{ fontSize: 32 }}>Hope</h1>
           <p className="text-muted" style={{ fontSize: 14, marginTop: 4 }}>A place to share encouragement, celebrate milestones, ask questions, and support others on their journey.</p>
         </div>
 
@@ -401,6 +403,7 @@ export default function Hope() {
             🌿
           </div>
         )}
+       </div>
       </div>
     </div>
   );

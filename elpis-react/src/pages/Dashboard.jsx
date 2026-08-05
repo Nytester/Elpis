@@ -14,13 +14,17 @@ const INITIAL_MEDS = [
   { id: 4, name: 'Prochlorperazine 10mg', time: '6:00 PM', done: false },
 ];
 
-// Same three demo people already used elsewhere in the app (Journey Timeline,
-// the existing "Next appointment" card) — not new fabrication, just reused.
-const VISITS = [
-  { date: 'Fri, Jul 17', title: 'Chemotherapy Infusion — Cycle 4', who: 'Dr. Rina Osei', initials: 'RO', color: '#1d7a5f', bg: 'rgba(29,122,95,.14)' },
-  { date: 'Jul 20', title: 'Complete Blood Count (CBC)', who: 'Jordan Tran, RN', initials: 'JT', color: '#7a4fb8', bg: 'rgba(148,98,210,.14)' },
-  { date: 'Jul 22', title: 'Video Consultation', who: 'Dr. Rina Osei', initials: 'RO', color: '#b5732a', bg: 'rgba(210,140,50,.16)' },
-];
+const VISIT_COLORS = ['#1d7a5f', '#7a4fb8', '#b5732a'];
+
+function formatVisitDate(iso) {
+  const d = new Date(iso);
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  const sameDay = (a, b) => a.toDateString() === b.toDateString();
+  if (sameDay(d, today)) return `Today, ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  if (sameDay(d, tomorrow)) return `Tomorrow, ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
 
 const JOURNEY_PHASES = [
   { label: 'Diagnosis', state: 'past' },
@@ -54,19 +58,21 @@ function monthGrid(date) {
 
 export default function Dashboard() {
   const [meds, setMeds] = useState(INITIAL_MEDS);
-  const { symptoms, authorizations } = usePatientData();
+  const { symptoms, authorizations, appointments } = usePatientData();
   const { profile } = useAuth();
   const firstName = profile?.full_name?.split(' ')[0] ?? '';
   const now = useClock();
 
   const toggleMed = (id) => setMeds((ms) => ms.map((m) => m.id === id ? { ...m, done: !m.done } : m));
   const atRiskAuth = authorizations.find((a) => a.at_risk_note && !['approved', 'denied'].includes(a.status));
+  const upcomingAppointments = appointments.filter((a) => new Date(a.scheduled_at) >= now && a.status !== 'cancelled');
+  const nextAppointment = upcomingAppointments[0];
   const days = monthGrid(now);
   const monthLabel = now.toLocaleDateString([], { month: 'short', year: 'numeric' });
   const timeLabel = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <Sidebar active="Dashboard" />
 
       <div className="ep-main">
@@ -112,13 +118,17 @@ export default function Dashboard() {
                   <span style={{ fontSize: 16, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>98.5%</span>
                   <svg viewBox="0 0 90 18" width="90" height="18" fill="none" stroke="#1d7a5f" strokeWidth="1.5"><path d="M0 12 L12 12 16 4 22 15 28 9 38 9 44 13 54 6 62 11 74 8 90 10" /></svg>
                 </div>
-                <div className="gl-chip" style={{ right: 14, bottom: 14, borderRadius: 14, padding: '10px 14px', gap: 10 }}>
-                  <div className="gl-avatar" style={{ width: 34, height: 34, fontSize: 12 }}>RO</div>
-                  <div>
-                    <div style={{ fontSize: 12.5, fontWeight: 600 }}>Tomorrow, 9:30 AM</div>
-                    <div style={{ fontSize: 10.5, color: 'rgba(34,48,43,.55)' }}>Infusion · Dr. Rina Osei</div>
+                {nextAppointment && (
+                  <div className="gl-chip" style={{ right: 14, bottom: 14, borderRadius: 14, padding: '10px 14px', gap: 10 }}>
+                    <div className="gl-avatar" style={{ width: 34, height: 34, fontSize: 12 }}>
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12.5, fontWeight: 600 }}>{formatVisitDate(nextAppointment.scheduled_at)}</div>
+                      <div style={{ fontSize: 10.5, color: 'rgba(34,48,43,.55)' }}>{nextAppointment.type}{nextAppointment.location ? ` · ${nextAppointment.location}` : ''}</div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -151,24 +161,30 @@ export default function Dashboard() {
               </div>
 
               <div>
-                <div style={{ fontSize: 14.5, fontWeight: 600, marginBottom: 10 }}>Upcoming visits</div>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  {VISITS.map((v) => (
-                    <div key={v.title} className="gl-panel gl-visit">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span className="gl-vicon" style={{ background: v.bg, color: v.color }}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
-                        </span>
-                        <span className="gl-vdate">{v.date}</span>
-                      </div>
-                      <div style={{ fontSize: 13, fontWeight: 500 }}>{v.title}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 'auto' }}>
-                        <div className="gl-avatar" style={{ background: v.color }}>{v.initials}</div>
-                        <span style={{ fontSize: 11, color: 'rgba(34,48,43,.55)' }}>{v.who}</span>
-                      </div>
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 600 }}>Upcoming visits</div>
+                  <Link to="/dashboard/appointments" style={{ fontSize: 12, color: '#1d7a5f' }}>View all →</Link>
                 </div>
+                {upcomingAppointments.length === 0 ? (
+                  <div className="gl-panel" style={{ padding: 16 }}>
+                    <p style={{ fontSize: 12.5, color: 'rgba(34,48,43,.55)', margin: 0 }}>Nothing scheduled yet.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    {upcomingAppointments.slice(0, 3).map((a, i) => (
+                      <div key={a.id} className="gl-panel gl-visit">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span className="gl-vicon" style={{ background: `color-mix(in srgb, ${VISIT_COLORS[i % 3]} 16%, transparent)`, color: VISIT_COLORS[i % 3] }}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
+                          </span>
+                          <span className="gl-vdate">{formatVisitDate(a.scheduled_at)}</span>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 500 }}>{a.type}</div>
+                        {a.location && <span style={{ fontSize: 11, color: 'rgba(34,48,43,.55)', marginTop: 'auto' }}>{a.location}</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

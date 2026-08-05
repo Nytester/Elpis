@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import Sidebar from '../components/Sidebar.jsx';
+import './dashboardGlass.css';
 
+// .ep-switch/.ep-setting-row/.ep-avatar are reused unchanged — they're
+// already driven entirely by var(--color-*) tokens, which .gl-dash
+// redefines, so they pick up the glass palette automatically without needing
+// their own gl- variants.
 function Switch({ checked, onChange, label }) {
   return (
     <label className="ep-switch" aria-label={label}>
@@ -57,106 +62,108 @@ export default function Settings() {
   };
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <Sidebar active="Settings" />
 
       <div className="ep-main">
-        <div style={{ marginBottom: 'var(--space-6)' }}>
-          <h1 style={{ fontSize: 30, fontWeight: 400 }}>Settings</h1>
-          <p className="text-muted" style={{ fontSize: 13, marginTop: 2 }}>Manage your profile, notifications, and who has access to your care.</p>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', maxWidth: 680 }}>
-          {/* Profile */}
-          <form onSubmit={saveProfile} className="card elev-sm" style={{ gap: 'var(--space-3)' }}>
-            <span className="card-kicker">Profile</span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              <div>
-                <label style={{ fontSize: 12, color: 'var(--color-neutral-600)' }}>Full name</label>
-                <input className="input" value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} />
-              </div>
-              <div>
-                <label style={{ fontSize: 12, color: 'var(--color-neutral-600)' }}>Email</label>
-                <input className="input" type="email" value={draft.email} onChange={(e) => setDraft((d) => ({ ...d, email: e.target.value }))} />
-              </div>
-              <div>
-                <label style={{ fontSize: 12, color: 'var(--color-neutral-600)' }}>Phone</label>
-                <input className="input" type="tel" value={draft.phone} onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))} />
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}>
-              <button type="submit" className="btn btn-primary">Save changes</button>
-              {saved && <span className="tag tag-accent">Saved</span>}
-            </div>
-          </form>
-
-          {/* Notifications */}
-          <div className="card elev-sm">
-            <span className="card-kicker">Notifications</span>
-            <div style={{ marginTop: 4 }}>
-              {notifications.map((n) => (
-                <div key={n.id} className="ep-setting-row">
-                  <div>
-                    <div style={{ fontSize: 14 }}>{n.label}</div>
-                    <div className="text-muted" style={{ fontSize: 12 }}>{n.desc}</div>
-                  </div>
-                  <Switch checked={n.on} onChange={() => toggleNotification(n.id)} label={n.label} />
-                </div>
-              ))}
-            </div>
+        <div className="gl-dash">
+          <div style={{ marginBottom: 20 }}>
+            <h1 className="gl-greeting">Settings</h1>
+            <p style={{ fontSize: 13, color: 'rgba(34,48,43,.55)', marginTop: 4 }}>Manage your profile, notifications, and who has access to your care.</p>
           </div>
 
-          {/* Care circle */}
-          <div className="card elev-sm">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span className="card-kicker">Care circle access</span>
-              <button className="btn btn-secondary" type="button" onClick={() => setShowInvite((s) => !s)}>+ Invite someone</button>
-            </div>
-            <p className="card-body" style={{ fontSize: 12 }}>People with access can view your dashboard, journey timeline, and documents.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 680 }}>
+            {/* Profile */}
+            <form onSubmit={saveProfile} className="gl-panel" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <span className="gl-kicker">Profile</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 12, color: 'rgba(34,48,43,.55)' }}>Full name</label>
+                  <input className="gl-input" style={{ width: '100%', marginTop: 4 }} value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: 'rgba(34,48,43,.55)' }}>Email</label>
+                  <input className="gl-input" style={{ width: '100%', marginTop: 4 }} type="email" value={draft.email} onChange={(e) => setDraft((d) => ({ ...d, email: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: 'rgba(34,48,43,.55)' }}>Phone</label>
+                  <input className="gl-input" style={{ width: '100%', marginTop: 4 }} type="tel" value={draft.phone} onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
+                <button type="submit" className="gl-pill gl-pill-primary" style={{ border: 'none' }}>Save changes</button>
+                {saved && <span className="gl-tag">Saved</span>}
+              </div>
+            </form>
 
-            {showInvite && (
-              <form onSubmit={sendInvite} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 4 }}>
-                <input
-                  className="input"
-                  placeholder="Name"
-                  value={inviteName}
-                  onChange={(e) => setInviteName(e.target.value)}
-                  style={{ flex: 2, minWidth: 160 }}
-                  autoFocus
-                />
-                <select className="input" value={inviteRelationship} onChange={(e) => setInviteRelationship(e.target.value)} style={{ flex: 1, minWidth: 140 }}>
-                  <option>Caregiver</option>
-                  <option>Family member</option>
-                  <option>Friend</option>
-                </select>
-                <button type="submit" className="btn btn-primary" disabled={!inviteName.trim()}>Send invite</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowInvite(false)}>Cancel</button>
-              </form>
-            )}
-
-            <div style={{ marginTop: 4 }}>
-              {circle.map((p) => (
-                <div key={p.id} className="ep-setting-row">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div className="ep-avatar">{p.name.split(' ').map((w) => w[0]).join('')}</div>
+            {/* Notifications */}
+            <div className="gl-panel" style={{ padding: 18 }}>
+              <span className="gl-kicker">Notifications</span>
+              <div style={{ marginTop: 4 }}>
+                {notifications.map((n) => (
+                  <div key={n.id} className="ep-setting-row">
                     <div>
-                      <div style={{ fontSize: 14 }}>{p.name}</div>
-                      <div className="text-muted" style={{ fontSize: 11 }}>{p.relationship}</div>
+                      <div style={{ fontSize: 14 }}>{n.label}</div>
+                      <div style={{ fontSize: 12, color: 'rgba(34,48,43,.55)' }}>{n.desc}</div>
                     </div>
+                    <Switch checked={n.on} onChange={() => toggleNotification(n.id)} label={n.label} />
                   </div>
-                  <Switch checked={p.hasAccess} onChange={() => toggleAccess(p.id)} label={`${p.name} access`} />
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Language */}
-          <div className="card elev-sm">
-            <span className="card-kicker">Language</span>
-            <h4 className="card-title">Display language</h4>
-            <select className="input" value={language} onChange={(e) => setLanguage(e.target.value)} style={{ maxWidth: 220 }}>
-              {LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}
-            </select>
+            {/* Care circle */}
+            <div className="gl-panel" style={{ padding: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span className="gl-kicker">Care circle access</span>
+                <button className="gl-pill" type="button" onClick={() => setShowInvite((s) => !s)}>+ Invite someone</button>
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(34,48,43,.6)', marginTop: 6 }}>People with access can view your dashboard, journey timeline, and documents.</p>
+
+              {showInvite && (
+                <form onSubmit={sendInvite} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+                  <input
+                    className="gl-input"
+                    placeholder="Name"
+                    value={inviteName}
+                    onChange={(e) => setInviteName(e.target.value)}
+                    style={{ flex: 2, minWidth: 160 }}
+                    autoFocus
+                  />
+                  <select className="gl-input" value={inviteRelationship} onChange={(e) => setInviteRelationship(e.target.value)} style={{ flex: 1, minWidth: 140 }}>
+                    <option>Caregiver</option>
+                    <option>Family member</option>
+                    <option>Friend</option>
+                  </select>
+                  <button type="submit" className="gl-pill gl-pill-primary" style={{ border: 'none' }} disabled={!inviteName.trim()}>Send invite</button>
+                  <button type="button" className="gl-pill" onClick={() => setShowInvite(false)}>Cancel</button>
+                </form>
+              )}
+
+              <div style={{ marginTop: 4 }}>
+                {circle.map((p) => (
+                  <div key={p.id} className="ep-setting-row">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="ep-avatar">{p.name.split(' ').map((w) => w[0]).join('')}</div>
+                      <div>
+                        <div style={{ fontSize: 14 }}>{p.name}</div>
+                        <div style={{ fontSize: 11, color: 'rgba(34,48,43,.55)' }}>{p.relationship}</div>
+                      </div>
+                    </div>
+                    <Switch checked={p.hasAccess} onChange={() => toggleAccess(p.id)} label={`${p.name} access`} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Language */}
+            <div className="gl-panel" style={{ padding: 18 }}>
+              <span className="gl-kicker">Language</span>
+              <div style={{ fontSize: 15, fontWeight: 600, marginTop: 4, marginBottom: 8 }}>Display language</div>
+              <select className="gl-input" value={language} onChange={(e) => setLanguage(e.target.value)} style={{ maxWidth: 220 }}>
+                {LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
           </div>
         </div>
       </div>

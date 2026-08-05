@@ -1,9 +1,43 @@
-/* Scoped to Dashboard.jsx only — imported directly there, not in index.css,
-   so it can't leak into or collide with the rest of the app's warm/gold
-   "Classical" theme. Everything here is namespaced under .gl-dash. */
+/* Scoped under .gl-dash / .gl-shell — imported directly by each glass page,
+   not in index.css, so it can't leak into or collide with the rest of the
+   app's warm/gold "Classical" theme.
+   Also used to reskin SHARED components that a glass page renders but can't
+   restyle by editing their own classNames (e.g. Transportation.jsx renders
+   the shared HospitalFinderPanel, which the public /hospital-finder page
+   also renders in the classic theme) — redefining Elpis's own design-token
+   custom properties inside .gl-dash makes every classic .card/.btn/.tag/etc
+   automatically pick up the glass palette wherever it's nested in here,
+   without touching that shared component's markup or affecting the public
+   page (which never gets wrapped in .gl-dash). */
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 .gl-dash {
+  --color-bg: #eef4f1;
+  --color-surface: #e3ece7;
+  --color-text: #22302b;
+  --color-accent: #1d7a5f;
+  --color-accent-2: #1d7a5f;
+  --color-divider: rgba(34, 48, 43, .14);
+  --color-neutral-100: rgba(255, 255, 255, .6);
+  --color-neutral-200: rgba(255, 255, 255, .5);
+  --color-neutral-500: rgba(34, 48, 43, .45);
+  --color-neutral-600: rgba(34, 48, 43, .55);
+  --color-neutral-800: #22302b;
+  --color-accent-100: rgba(29, 122, 95, .12);
+  --color-accent-400: #4fa383;
+  --color-accent-500: #1d7a5f;
+  --color-accent-700: #1d7a5f;
+  --color-accent-800: #145c47;
+  --color-accent-900: #0d3a2c;
+  --font-heading: 'DM Sans', sans-serif;
+  --font-heading-weight: 600;
+  --font-body: 'DM Sans', sans-serif;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 4px 18px rgba(40, 60, 52, .08);
+  --shadow-md: 0 8px 26px rgba(40, 60, 52, .12);
+  --shadow-lg: 0 18px 50px rgba(40, 60, 52, .15);
+
   font-family: 'DM Sans', sans-serif;
   color: #22302b;
   border-radius: 28px;
@@ -17,6 +51,39 @@
 }
 .gl-dash a { text-decoration: none; color: inherit; }
 .gl-dash a:hover { color: #1d7a5f; }
+
+/* Structural overrides for classic component chrome that isn't driven by a
+   custom property (background: transparent, hard-coded border-radius, etc.)
+   — everything else (tag colors, slider thumb, icon fills) cascades from the
+   custom-property redefinitions above since the classic stylesheet already
+   references var(--color-*) throughout, including in inline SVG attributes. */
+.gl-dash .card {
+  background: rgba(255, 255, 255, .6);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.gl-dash .btn { font-family: 'DM Sans', sans-serif; border-radius: 999px; }
+.gl-dash .btn-primary { background: #1d7a5f; color: #eafff5; border-color: #1d7a5f; }
+.gl-dash .btn-primary:hover { background: #25936f; color: #eafff5; }
+.gl-dash .btn-secondary:hover { background: rgba(255, 255, 255, .6); }
+.gl-dash .input { background: rgba(255, 255, 255, .55); border-radius: 12px; }
+.gl-dash .seg { border-radius: 999px; overflow: hidden; }
+
+/* Shares the .gl-dash gradient at the shell level so the sidebar (a sibling
+   of .ep-main, not a descendant of .gl-dash) sits on the SAME ambient
+   background instead of plain page ivory — that shared backdrop is what the
+   sidebar's frosted glass needs to actually read as the same surface instead
+   of a mismatched flat panel next to it. */
+.ep-shell-dash.gl-shell {
+  background: linear-gradient(180deg, #f2f5f3 0%, #dfe8e3 55%, #c6d4cd 100%);
+}
+.ep-shell-dash.gl-shell .ep-sidebar {
+  background: rgba(255, 255, 255, .55);
+  border-color: rgba(255, 255, 255, .8);
+}
+.ep-shell-dash.gl-shell .ep-navitem { color: rgba(34, 48, 43, .5); }
+.ep-shell-dash.gl-shell .ep-navitem:hover { background: rgba(255, 255, 255, .75); color: #22302b; }
+.ep-shell-dash.gl-shell .ep-navitem.active { background: rgba(255, 255, 255, .95); color: #1d7a5f; box-shadow: 0 2px 8px rgba(40, 60, 52, .12); }
+.ep-shell-dash.gl-shell .ep-navitem .ep-navlabel { background: #22302b; color: #eafff5; }
 
 .gl-panel {
   background: rgba(255, 255, 255, .6);
@@ -96,6 +163,15 @@
 
 .gl-kicker { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #1d7a5f; }
 
+/* Journey Timeline — vertical milestone list */
+.gl-vtimeline { position: relative; padding-left: 26px; }
+.gl-vtimeline::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 1px; background: rgba(34, 48, 43, .12); }
+.gl-vitem { position: relative; padding-bottom: 20px; }
+.gl-vitem:last-child { padding-bottom: 0; }
+.gl-vdot { position: absolute; left: -26px; top: 3px; width: 11px; height: 11px; border-radius: 50%; background: #fff; border: 2px solid rgba(34, 48, 43, .2); }
+.gl-vdot.done { background: rgba(29, 122, 95, .45); border-color: rgba(29, 122, 95, .45); }
+.gl-vdot.current { background: #1d7a5f; border-color: #1d7a5f; width: 13px; height: 13px; left: -27px; box-shadow: 0 0 0 3px rgba(29, 122, 95, .2); }
+
 /* Chat (Care Team) */
 .gl-contact {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
@@ -120,5 +196,26 @@
 }
 .gl-input:focus { background: #fff; border-color: rgba(29, 122, 95, .4); }
 .gl-input::placeholder { color: rgba(34, 48, 43, .45); }
+.gl-chip {
+  display: inline-flex; align-items: center; padding: 7px 13px;
+  border: 1px solid rgba(255, 255, 255, .9); border-radius: 999px; font-size: 12px; cursor: pointer;
+  background: rgba(255, 255, 255, .55); color: #22302b; font-family: inherit;
+  transition: background .15s ease, border-color .15s ease;
+}
+.gl-chip:hover { background: #fff; border-color: rgba(29, 122, 95, .4); color: #1d7a5f; }
 .gl-tag { display: inline-flex; align-items: center; font-size: 11px; padding: 3px 10px; border-radius: 6px; background: rgba(29,122,95,.12); color: #1d7a5f; }
 .gl-tag-accent { background: rgba(210,140,50,.16); color: #b5732a; }
+.gl-tag-mild { background: rgba(34,48,43,.08); color: rgba(34,48,43,.6); }
+.gl-tag-moderate { background: rgba(210,140,50,.16); color: #b5732a; }
+.gl-tag-severe { background: rgba(196,68,68,.14); color: #b23a3a; }
+.gl-tag-purple { background: rgba(122,79,184,.14); color: #7a4fb8; }
+.gl-tag-outline { background: transparent; border: 1px solid #1d7a5f; color: #1d7a5f; }
+
+/* Segmented control (severity picker, filters) */
+.gl-seg { display: inline-flex; background: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.9); border-radius: 999px; padding: 3px; gap: 2px; }
+.gl-seg-opt {
+  padding: 6px 14px; border-radius: 999px; font-size: 12.5px; cursor: pointer; color: rgba(34,48,43,.6);
+  transition: background .15s ease, color .15s ease;
+}
+.gl-seg-opt.selected { background: #1d7a5f; color: #fff; }
+.gl-seg-opt:not(.selected):hover { background: rgba(255,255,255,.7); }

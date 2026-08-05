@@ -6,6 +6,7 @@ import { useInsuranceDocuments } from '../hooks/useInsuranceDocuments.js';
 import { useInsuranceCoverage } from '../hooks/useInsuranceCoverage.js';
 import { useCareTasks } from '../hooks/useCareTasks.js';
 import { getSteps } from '../lib/authorizationSteps.js';
+import './dashboardGlass.css';
 
 const CATEGORY_LABEL = {
   insurance_card: 'Insurance Card',
@@ -329,12 +330,13 @@ export default function Insurance() {
   const { session } = useAuth();
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <Sidebar active="Insurance" />
 
       <div className="ep-main">
+       <div className="gl-dash">
         <div style={{ marginBottom: 'var(--space-6)' }}>
-          <h1 style={{ fontSize: 30, fontWeight: 400 }}>Insurance</h1>
+          <h1 className="gl-greeting">Insurance</h1>
           <p className="text-muted" style={{ fontSize: 13, marginTop: 2 }}>Track the status of authorization requests your care team has filed.</p>
         </div>
 
@@ -384,6 +386,7 @@ export default function Insurance() {
         <AppealChecklist />
 
         {patientId && <DocumentUploader patientId={patientId} authorizations={authorizations} session={session} />}
+       </div>
       </div>
     </div>
   );

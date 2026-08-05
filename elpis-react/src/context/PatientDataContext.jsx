@@ -30,6 +30,7 @@ export function PatientDataProvider({ children }) {
   const [symptoms, setSymptoms] = useState([]);
   const [messages, setMessages] = useState([]);
   const [authorizations, setAuthorizations] = useState([]);
+  const [appointments, setAppointments] = useState([]);
 
   // Resolve the logged-in user's own patients.id row
   useEffect(() => {
@@ -38,6 +39,7 @@ export function PatientDataProvider({ children }) {
       setSymptoms([]);
       setMessages([]);
       setAuthorizations([]);
+      setAppointments([]);
       return;
     }
     supabase.from('patients').select('id').eq('profile_id', session.user.id).single()
@@ -123,6 +125,33 @@ export function PatientDataProvider({ children }) {
     };
   }, [patientId]);
 
+  // Load + realtime-subscribe to this patient's own appointments (read-only —
+  // only the provider writes to this table)
+  useEffect(() => {
+    if (!patientId) return;
+
+    let active = true;
+    const load = () => {
+      supabase
+        .from('appointments')
+        .select('*')
+        .eq('patient_id', patientId)
+        .order('scheduled_at', { ascending: true })
+        .then(({ data }) => { if (active) setAppointments(data ?? []); });
+    };
+    load();
+
+    const channel = supabase
+      .channel(`appointments-${patientId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments', filter: `patient_id=eq.${patientId}` }, load)
+      .subscribe();
+
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [patientId]);
+
   const sendMessage = useCallback(async (body) => {
     if (!patientId || !session) return;
     await supabase.from('messages').insert({ patient_id: patientId, author_id: session.user.id, body });
@@ -139,7 +168,7 @@ export function PatientDataProvider({ children }) {
   }, [patientId]);
 
   return (
-    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations }}>
+    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations, appointments }}>
       {children}
     </PatientDataContext.Provider>
   );

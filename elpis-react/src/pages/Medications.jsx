@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Sidebar from '../components/Sidebar.jsx';
 import { usePatientData } from '../context/PatientDataContext.jsx';
+import './dashboardGlass.css';
 
 const MEDICATIONS = [
   { id: 1, name: 'Ondansetron 8mg', purpose: 'Prevents nausea from chemo', type: 'As needed', frequency: 'As needed, up to 3x/day', prescriber: 'Dr. Rina Osei', refillDate: 'Aug 1, 2026', times: ['8:00 AM'] },
@@ -13,7 +14,7 @@ const MEDICATIONS = [
 
 const INITIAL_DONE = { '1-8:00 AM': true, '2-8:00 AM': true, '3-12:00 PM': true, '4-6:00 PM': false, '5-8:00 AM': true, '5-8:00 PM': false };
 
-const TYPE_TAG = { Scheduled: 'tag-neutral', 'As needed': 'tag-accent-2' };
+const TYPE_TAG = { Scheduled: 'gl-tag', 'As needed': 'gl-tag-accent' };
 
 export default function Medications() {
   const { requestRefill: requestRefillShared } = usePatientData();
@@ -32,54 +33,56 @@ export default function Medications() {
   };
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <Sidebar active="Medications" />
 
       <div className="ep-main">
-        <div style={{ marginBottom: 'var(--space-6)' }}>
-          <h1 style={{ fontSize: 30, fontWeight: 400 }}>Medications</h1>
-          <p className="text-muted" style={{ fontSize: 13, marginTop: 2 }}>Today's schedule and your full medication list.</p>
-        </div>
+        <div className="gl-dash">
+          <div style={{ marginBottom: 20 }}>
+            <h1 className="gl-greeting">Medications</h1>
+            <p style={{ fontSize: 13, color: 'rgba(34,48,43,.55)', marginTop: 4 }}>Today's schedule and your full medication list.</p>
+          </div>
 
-        <div className="card elev-sm" style={{ marginBottom: 'var(--space-6)' }}>
-          <span className="card-kicker">Today's schedule</span>
-          <h4 className="card-title">{takenCount} of {doses.length} taken</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', marginTop: 4 }}>
-            {doses.map((dose) => (
-              <div key={dose.key} className="ep-medrow">
-                <span className={`ep-check${doneDoses[dose.key] ? ' done' : ''}`} onClick={() => toggleDose(dose.key)}>
-                  {doneDoses[dose.key] && (
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14 }}>{dose.name}</div>
-                  <div className="text-muted" style={{ fontSize: 11 }}>{dose.time}</div>
+          <div className="gl-panel" style={{ padding: 18, marginBottom: 20 }}>
+            <span className="gl-kicker">Today's schedule</span>
+            <div style={{ fontSize: 15, fontWeight: 600, marginTop: 4 }}>{takenCount} of {doses.length} taken</div>
+            <div style={{ display: 'flex', flexDirection: 'column', marginTop: 8 }}>
+              {doses.map((dose) => (
+                <div key={dose.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0' }}>
+                  <span className={`gl-check${doneDoses[dose.key] ? ' done' : ''}`} onClick={() => toggleDose(dose.key)}>
+                    {doneDoses[dose.key] && (
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14 }}>{dose.name}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(34,48,43,.55)' }}>{dose.time}</div>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>All medications</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+            {meds.map((med) => (
+              <div key={med.id} className="gl-panel" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span className={`gl-tag ${TYPE_TAG[med.type]}`} style={{ alignSelf: 'flex-start' }}>{med.type}</span>
+                <div style={{ fontSize: 15, fontWeight: 600, marginTop: 4 }}>{med.name}</div>
+                <p style={{ fontSize: 12, color: 'rgba(34,48,43,.7)', margin: 0 }}>{med.purpose}</p>
+                <p style={{ fontSize: 11, color: 'rgba(34,48,43,.55)', margin: 0 }}>{med.frequency}</p>
+                <p style={{ fontSize: 11, color: 'rgba(34,48,43,.55)', margin: 0 }}>Prescribed by {med.prescriber}</p>
+                <p style={{ fontSize: 11, color: 'rgba(34,48,43,.55)', margin: 0 }}>Refill: {med.refillDate}</p>
+                {med.refillRequested ? (
+                  <span className="gl-tag gl-tag-accent" style={{ alignSelf: 'flex-start', marginTop: 6 }}>Refill requested</span>
+                ) : (
+                  <button className="gl-pill" style={{ width: '100%', marginTop: 6, border: '1px solid rgba(34,48,43,.15)' }} onClick={() => requestRefill(med.id)}>Request refill</button>
+                )}
               </div>
             ))}
           </div>
-        </div>
-
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 'var(--space-3)' }}>All medications</h2>
-        <div className="ep-resource-grid">
-          {meds.map((med) => (
-            <div key={med.id} className="card elev-sm">
-              <span className={`tag ${TYPE_TAG[med.type]}`} style={{ alignSelf: 'flex-start' }}>{med.type}</span>
-              <h3 className="card-title" style={{ fontSize: 15, marginTop: 4 }}>{med.name}</h3>
-              <p className="card-body" style={{ fontSize: 12 }}>{med.purpose}</p>
-              <p className="text-muted" style={{ fontSize: 11, margin: 0 }}>{med.frequency}</p>
-              <p className="text-muted" style={{ fontSize: 11, margin: 0 }}>Prescribed by {med.prescriber}</p>
-              <p className="text-muted" style={{ fontSize: 11, margin: 0 }}>Refill: {med.refillDate}</p>
-              {med.refillRequested ? (
-                <span className="tag tag-accent" style={{ alignSelf: 'flex-start', marginTop: 6 }}>Refill requested</span>
-              ) : (
-                <button className="btn btn-secondary btn-block" onClick={() => requestRefill(med.id)}>Request refill</button>
-              )}
-            </div>
-          ))}
         </div>
       </div>
     </div>
