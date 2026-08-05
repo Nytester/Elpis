@@ -9,8 +9,8 @@ export default function Footer() {
       </div>
       <div>
         <h6 style={{ marginBottom: 'var(--space-3)' }}>Product</h6>
-        <Link className="ep-footlink" to="/dashboard">Dashboard</Link>
-        <Link className="ep-footlink" to="/dashboard">AI Assistant</Link>
+        <Link className="ep-footlink" to="/how-it-works#dashboard">Dashboard</Link>
+        <Link className="ep-footlink" to="/how-it-works#ai-assistant">AI Assistant</Link>
         <Link className="ep-footlink" to="/pricing">Pricing</Link>
       </div>
       <div>

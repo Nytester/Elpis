@@ -139,7 +139,7 @@ export function PatientDataProvider({ children }) {
   }, [patientId]);
 
   return (
-    <PatientDataContext.Provider value={{ symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations }}>
+    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations }}>
       {children}
     </PatientDataContext.Provider>
   );

@@ -14,7 +14,7 @@ export default function Landing() {
           <p style={{ fontSize: 17, maxWidth: '46ch', opacity: .85, marginTop: 'var(--space-3)' }}>Elpis brings your whole cancer journey into one quiet place — appointments, medications, symptoms and the people caring for you, gathered where you can find them, whether your care team is down the hall or an hour away.</p>
           <div className="ep-btnrow" style={{ marginTop: 'var(--space-4)' }}>
             <Link className="btn btn-primary" to="/register">Get started</Link>
-            <a className="btn btn-ghost" href="#">See how it works ›</a>
+            <Link className="btn btn-ghost" to="/how-it-works">See how it works ›</Link>
           </div>
         </div>
         <figure className="plate" style={{ margin: 0 }}>

@@ -1,0 +1,124 @@
+/* Scoped to Dashboard.jsx only — imported directly there, not in index.css,
+   so it can't leak into or collide with the rest of the app's warm/gold
+   "Classical" theme. Everything here is namespaced under .gl-dash. */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+.gl-dash {
+  font-family: 'DM Sans', sans-serif;
+  color: #22302b;
+  border-radius: 28px;
+  padding: 28px 28px 36px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 500px at 90% 100%, rgba(126, 211, 183, .35), transparent 60%),
+    radial-gradient(700px 420px at 0% 90%, rgba(140, 180, 210, .3), transparent 60%),
+    linear-gradient(180deg, #f2f5f3 0%, #dfe8e3 55%, #c6d4cd 100%);
+}
+.gl-dash a { text-decoration: none; color: inherit; }
+.gl-dash a:hover { color: #1d7a5f; }
+
+.gl-panel {
+  background: rgba(255, 255, 255, .6);
+  border: 1px solid rgba(255, 255, 255, .85);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 18px rgba(40, 60, 52, .08);
+}
+
+.gl-greeting {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.gl-pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: rgba(255, 255, 255, .75); border: 1px solid rgba(255, 255, 255, .95);
+  color: #22302b; box-shadow: 0 2px 8px rgba(40, 60, 52, .08);
+  font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+}
+.gl-pill:hover { background: #fff; }
+.gl-pill-primary { background: #1d7a5f; color: #eafff5; border-color: rgba(255,255,255,.3); }
+.gl-pill-primary:hover { background: #25936f; color: #eafff5; }
+
+.gl-chip {
+  position: absolute; display: flex; align-items: center; gap: 8px;
+  background: rgba(255, 255, 255, .82); border: 1px solid rgba(255, 255, 255, .95);
+  box-shadow: 0 4px 14px rgba(40, 60, 52, .1); border-radius: 999px; padding: 7px 14px;
+  font-size: 12px; backdrop-filter: blur(10px);
+}
+.gl-sample-tag {
+  font-size: 8.5px; letter-spacing: .04em; text-transform: uppercase;
+  color: rgba(34, 48, 43, .5); background: rgba(34, 48, 43, .08);
+  border-radius: 4px; padding: 1px 5px; margin-left: 4px;
+}
+
+.gl-hero-art {
+  position: relative; width: 100%; height: 340px; border-radius: 18px; overflow: hidden;
+  background: linear-gradient(160deg, #cfe9ff 0%, #eaf6ff 60%, #f2f5f3 100%);
+  border: 1px solid rgba(255,255,255,.7);
+  display: flex; align-items: center; justify-content: center;
+}
+.gl-hero-art img {
+  width: 100%; height: 100%; object-fit: contain; object-position: center 46%;
+  filter: drop-shadow(0 18px 30px rgba(29,122,95,.22));
+}
+
+.gl-ring { position: relative; width: 60px; height: 60px; flex: none; }
+.gl-ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+
+.gl-avatar {
+  width: 26px; height: 26px; border-radius: 50%; background: #1d7a5f; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex: none;
+}
+.gl-avatar-lg { width: 46px; height: 46px; font-size: 15px; }
+
+.gl-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.gl-cal .hd { color: rgba(34, 48, 43, .45); font-size: 9px; letter-spacing: .08em; padding: 4px 0; }
+.gl-day { padding: 5px 0; border-radius: 8px; color: rgba(34, 48, 43, .8); }
+.gl-day.dim { color: rgba(34, 48, 43, .25); }
+.gl-day.today { background: #1d7a5f; color: #fff; font-weight: 600; }
+
+.gl-vicon { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex: none; }
+.gl-vicon svg { width: 15px; height: 15px; }
+.gl-vdate { font-size: 10.5px; color: rgba(34, 48, 43, .55); }
+.gl-visit { flex: 1; padding: 14px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+
+.gl-check {
+  width: 18px; height: 18px; flex: none; border-radius: 50%; border: 1.5px solid rgba(34,48,43,.25);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.gl-check.done { border-color: #1d7a5f; background: #1d7a5f; }
+
+.gl-kicker { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #1d7a5f; }
+
+/* Chat (Care Team) */
+.gl-contact {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  background: transparent; border: none; border-radius: 12px; padding: 9px 11px;
+  cursor: pointer; font-family: inherit; color: inherit;
+}
+.gl-contact:hover { background: rgba(255, 255, 255, .65); }
+.gl-contact.active { background: rgba(255, 255, 255, .9); box-shadow: 0 2px 8px rgba(40, 60, 52, .1); }
+.gl-msg { max-width: 68%; padding: 9px 13px; font-size: 13px; line-height: 1.45; }
+.gl-msg-in {
+  align-self: flex-start; background: rgba(255, 255, 255, .78);
+  border: 1px solid rgba(255, 255, 255, .95); border-radius: 14px 14px 14px 4px;
+  box-shadow: 0 2px 8px rgba(40, 60, 52, .06);
+}
+.gl-msg-out { align-self: flex-end; background: #1d7a5f; color: #eafff5; border-radius: 14px 14px 4px 14px; }
+.gl-msg-time { font-size: 10px; color: rgba(34, 48, 43, .5); margin-top: 4px; }
+.gl-msg-out .gl-msg-time { color: rgba(234, 255, 245, .65); }
+.gl-input {
+  width: 100%; font: inherit; font-size: 13.5px; color: #22302b;
+  background: rgba(255, 255, 255, .75); border: 1px solid rgba(255, 255, 255, .95);
+  border-radius: 14px; padding: 10px 14px; outline: none;
+}
+.gl-input:focus { background: #fff; border-color: rgba(29, 122, 95, .4); }
+.gl-input::placeholder { color: rgba(34, 48, 43, .45); }
+.gl-tag { display: inline-flex; align-items: center; font-size: 11px; padding: 3px 10px; border-radius: 6px; background: rgba(29,122,95,.12); color: #1d7a5f; }
+.gl-tag-accent { background: rgba(210,140,50,.16); color: #b5732a; }
