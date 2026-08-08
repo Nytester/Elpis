@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { supabase } from '../lib/supabaseClient.js';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { signUp, session, profile } = useAuth();
+  const { signUp, signInWithGoogle, session, profile } = useAuth();
   const [role, setRole] = useState('patient');
   const [form, setForm] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
   const [agreed, setAgreed] = useState(false);
@@ -13,8 +14,22 @@ export default function Register() {
 
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
+  // Google's signInWithOAuth() has no equivalent to signUp()'s options.data,
+  // so the Patient/Caregiver choice can't ride through the redirect the same
+  // way — it's stashed here (same trick ClaimInvite.jsx uses for its invite
+  // token) and applied via set_own_role() once the session reappears, before
+  // redirecting into the dashboard.
   useEffect(() => {
-    if (session && profile) navigate(profile.role === 'provider' ? '/provider' : '/dashboard');
+    if (!session || !profile) return;
+    const pendingRole = sessionStorage.getItem('elpis_pending_role');
+    const applyAndRedirect = async () => {
+      if (pendingRole && pendingRole !== profile.role) {
+        await supabase.rpc('set_own_role', { new_role: pendingRole });
+        sessionStorage.removeItem('elpis_pending_role');
+      }
+      navigate(profile.role === 'provider' ? '/provider' : '/dashboard');
+    };
+    applyAndRedirect();
   }, [session, profile, navigate]);
 
   async function handleSubmit(e) {
@@ -37,6 +52,11 @@ export default function Register() {
     }
   }
 
+  const handleGoogle = () => {
+    sessionStorage.setItem('elpis_pending_role', role);
+    signInWithGoogle(`${window.location.origin}/register`);
+  };
+
   return (
     <div className="ep-shell">
       <Link to="/" className="ep-logo" style={{ fontSize: 26, marginBottom: 'var(--space-6)', textDecoration: 'none' }}>Elpis</Link>
@@ -45,21 +65,32 @@ export default function Register() {
           <>
             <h2 style={{ fontSize: 26, textAlign: 'center' }}>Create your account</h2>
             <p className="text-muted" style={{ textAlign: 'center', fontSize: 13, marginTop: 4, marginBottom: 'var(--space-4)' }}>Free for patients and caregivers.</p>
+
+            <div className="field">
+              <label>I am a</label>
+              <div className="seg" style={{ width: '100%' }}>
+                <label className={`seg-opt${role === 'patient' ? ' selected' : ''}`} style={{ flex: 1, justifyContent: 'center' }} onClick={() => setRole('patient')}>
+                  <input type="radio" name="role" readOnly checked={role === 'patient'} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
+                  <span>Patient</span>
+                </label>
+                <label className={`seg-opt${role === 'caregiver' ? ' selected' : ''}`} style={{ flex: 1, justifyContent: 'center' }} onClick={() => setRole('caregiver')}>
+                  <input type="radio" name="role" readOnly checked={role === 'caregiver'} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
+                  <span>Caregiver</span>
+                </label>
+              </div>
+            </div>
+
+            <button type="button" className="btn btn-secondary btn-block" onClick={handleGoogle} style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
+              Continue with Google
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 'var(--space-3) 0' }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
+              <span className="text-muted" style={{ fontSize: 12 }}>or</span>
+              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
+            </div>
+
             <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }} onSubmit={handleSubmit}>
               {errors.form && <div className="ep-err">{errors.form}</div>}
-              <div className="field">
-                <label>I am a</label>
-                <div className="seg" style={{ width: '100%' }}>
-                  <label className={`seg-opt${role === 'patient' ? ' selected' : ''}`} style={{ flex: 1, justifyContent: 'center' }} onClick={() => setRole('patient')}>
-                    <input type="radio" name="role" readOnly checked={role === 'patient'} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
-                    <span>Patient</span>
-                  </label>
-                  <label className={`seg-opt${role === 'caregiver' ? ' selected' : ''}`} style={{ flex: 1, justifyContent: 'center' }} onClick={() => setRole('caregiver')}>
-                    <input type="radio" name="role" readOnly checked={role === 'caregiver'} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
-                    <span>Caregiver</span>
-                  </label>
-                </div>
-              </div>
               <div className="field">
                 <label>Full name</label>
                 <input className="input" type="text" value={form.fullName} onChange={set('fullName')} />

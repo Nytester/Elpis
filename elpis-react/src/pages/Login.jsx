@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { signIn, session, profile } = useAuth();
+  const { signIn, signInWithGoogle, session, profile } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -32,6 +32,8 @@ export default function Login() {
     }
   }
 
+  const handleGoogle = () => signInWithGoogle(`${window.location.origin}/login`);
+
   return (
     <div className="ep-shell">
       <Link to="/" className="ep-logo" style={{ fontSize: 26, marginBottom: 'var(--space-6)', textDecoration: 'none' }}>Elpis</Link>
@@ -40,6 +42,16 @@ export default function Login() {
           <>
             <h2 style={{ fontSize: 26, textAlign: 'center' }}>Welcome back</h2>
             <p className="text-muted" style={{ textAlign: 'center', fontSize: 13, marginTop: 4, marginBottom: 'var(--space-4)' }}>Log in to your Elpis account.</p>
+
+            <button type="button" className="btn btn-secondary btn-block" onClick={handleGoogle} style={{ marginBottom: 'var(--space-3)' }}>
+              Continue with Google
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 'var(--space-3) 0' }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
+              <span className="text-muted" style={{ fontSize: 12 }}>or</span>
+              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
+            </div>
+
             <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }} onSubmit={handleSubmit}>
               {errors.form && <div className="ep-err">{errors.form}</div>}
               <div className="field">
