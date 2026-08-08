@@ -185,7 +185,7 @@ function GlobeMap({ patientCoords, hospitals, radius, hoveredId, onHover, zip })
           <care-globe
             ref={elRef}
             zip={zip}
-            radius={radius}
+            ring={radius / RADIUS_MAX}
             highlight={hoveredId ?? ''}
             data-hospitals={hospitalsJson}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
