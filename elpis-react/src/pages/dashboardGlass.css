@@ -1,17 +1,18 @@
-/* Scoped under .gl-dash / .gl-shell — imported directly by each glass page,
-   not in index.css, so it can't leak into or collide with the rest of the
-   app's warm/gold "Classical" theme.
+/* Scoped under .gl-dash / .gl-shell (patient dashboard) or .gl-public
+   (public site) — imported directly by each glass page, not in index.css,
+   so it can't leak into or collide with the rest of the app's warm/gold
+   "Classical" theme.
    Also used to reskin SHARED components that a glass page renders but can't
    restyle by editing their own classNames (e.g. Transportation.jsx renders
    the shared HospitalFinderPanel, which the public /hospital-finder page
    also renders in the classic theme) — redefining Elpis's own design-token
-   custom properties inside .gl-dash makes every classic .card/.btn/.tag/etc
-   automatically pick up the glass palette wherever it's nested in here,
-   without touching that shared component's markup or affecting the public
-   page (which never gets wrapped in .gl-dash). */
+   custom properties inside these wrappers makes every classic
+   .card/.btn/.tag/.nav/etc automatically pick up the glass palette wherever
+   it's nested in here, without touching that shared component's markup or
+   affecting a page that never gets wrapped in one of these. */
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-.gl-dash {
+.gl-dash, .gl-public {
   --color-bg: #eef4f1;
   --color-surface: #e3ece7;
   --color-text: #22302b;
@@ -40,6 +41,8 @@
 
   font-family: 'DM Sans', sans-serif;
   color: #22302b;
+}
+.gl-dash {
   border-radius: 28px;
   padding: 28px 28px 36px;
   position: relative;
@@ -49,24 +52,33 @@
     radial-gradient(700px 420px at 0% 90%, rgba(140, 180, 210, .3), transparent 60%),
     linear-gradient(180deg, #f2f5f3 0%, #dfe8e3 55%, #c6d4cd 100%);
 }
-.gl-dash a { text-decoration: none; color: inherit; }
-.gl-dash a:hover { color: #1d7a5f; }
+.gl-public {
+  min-height: 100vh;
+  background:
+    radial-gradient(1000px 600px at 85% 0%, rgba(126, 211, 183, .3), transparent 60%),
+    radial-gradient(800px 500px at 5% 100%, rgba(140, 180, 210, .25), transparent 60%),
+    linear-gradient(180deg, #f2f5f3 0%, #dfe8e3 55%, #c6d4cd 100%);
+}
+.gl-dash a, .gl-public a { text-decoration: none; color: inherit; }
+.gl-dash a:hover, .gl-public a:hover { color: #1d7a5f; }
 
 /* Structural overrides for classic component chrome that isn't driven by a
    custom property (background: transparent, hard-coded border-radius, etc.)
    — everything else (tag colors, slider thumb, icon fills) cascades from the
    custom-property redefinitions above since the classic stylesheet already
    references var(--color-*) throughout, including in inline SVG attributes. */
-.gl-dash .card {
+.gl-dash .card, .gl-public .card {
   background: rgba(255, 255, 255, .6);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
-.gl-dash .btn { font-family: 'DM Sans', sans-serif; border-radius: 999px; }
-.gl-dash .btn-primary { background: #1d7a5f; color: #eafff5; border-color: #1d7a5f; }
-.gl-dash .btn-primary:hover { background: #25936f; color: #eafff5; }
-.gl-dash .btn-secondary:hover { background: rgba(255, 255, 255, .6); }
-.gl-dash .input { background: rgba(255, 255, 255, .55); border-radius: 12px; }
-.gl-dash .seg { border-radius: 999px; overflow: hidden; }
+.gl-dash .btn, .gl-public .btn { font-family: 'DM Sans', sans-serif; border-radius: 999px; }
+.gl-dash .btn-primary, .gl-public .btn-primary { background: #1d7a5f; color: #eafff5; border-color: #1d7a5f; }
+.gl-dash .btn-primary:hover, .gl-public .btn-primary:hover { background: #25936f; color: #eafff5; }
+.gl-dash .btn-secondary:hover, .gl-public .btn-secondary:hover { background: rgba(255, 255, 255, .6); }
+.gl-dash .input, .gl-public .input { background: rgba(255, 255, 255, .55); border-radius: 12px; }
+.gl-dash .seg, .gl-public .seg { border-radius: 999px; overflow: hidden; }
+.gl-public .plate { filter: none; border: 1px solid rgba(255, 255, 255, .85); border-radius: 18px; outline: none; }
+.gl-public .nav { border-bottom-color: rgba(34, 48, 43, .12); }
 
 /* Shares the .gl-dash gradient at the shell level so the sidebar (a sibling
    of .ep-main, not a descendant of .gl-dash) sits on the SAME ambient

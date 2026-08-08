@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
+import '../pages/dashboardGlass.css';
 
 export default function Landing() {
   return (
-    <>
+    <div className="gl-public">
       <Navbar />
 
       <div className="ep-container" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 'var(--space-8)', alignItems: 'center', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
@@ -93,6 +94,6 @@ export default function Landing() {
 
       <div className="hr ep-container" />
       <Footer />
-    </>
+    </div>
   );
 }
