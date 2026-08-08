@@ -78,7 +78,12 @@ export default function Dashboard() {
       <div className="ep-main">
         <div className="gl-dash">
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22 }}>
-            <h1 className="gl-greeting" style={{ flex: 1 }}>Good afternoon{firstName ? `, ${firstName}` : ''}.</h1>
+            <div style={{ flex: 1 }}>
+              <h1 className="gl-greeting">Good afternoon{firstName ? `, ${firstName}` : ''}.</h1>
+              {profile?.role && (
+                <span className="gl-tag" style={{ marginTop: 6, textTransform: 'capitalize' }}>{profile.role} view</span>
+              )}
+            </div>
             <Link className="gl-pill" to="/dashboard/symptoms">Log a symptom</Link>
             <div className="gl-avatar gl-avatar-lg" style={{ background: '#1d7a5f' }}>
               {firstName ? firstName[0].toUpperCase() : 'Y'}
