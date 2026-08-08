@@ -230,4 +230,23 @@
   transition: background .15s ease, color .15s ease;
 }
 .gl-seg-opt.selected { background: #1d7a5f; color: #fff; }
+
+/* Landing page */
+@keyframes gl-float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-12px, -22px) rotate(4deg); } }
+@keyframes gl-float2 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(14px, -16px) rotate(-3deg); } }
+.gl-blob { position: absolute; border-radius: 50%; filter: blur(2px); pointer-events: none; z-index: 0; }
+.gl-hero-frame {
+  position: relative; border-radius: 22px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.85); box-shadow: 0 30px 70px -30px rgba(20,60,52,.35);
+  background: linear-gradient(160deg, #cfe9df 0%, #e8f2ee 60%, #f2f5f3 100%);
+}
+.gl-bento {
+  border-radius: 20px; padding: 22px;
+  background: rgba(255,255,255,.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.85);
+  transition: transform .2s ease, box-shadow .2s ease;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.gl-bento:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -20px rgba(20,60,52,.3); }
+.gl-quote-mark { font-family: 'DM Sans', sans-serif; font-size: 72px; font-weight: 700; color: rgba(29,122,95,.18); line-height: 1; }
 .gl-seg-opt:not(.selected):hover { background: rgba(255,255,255,.7); }

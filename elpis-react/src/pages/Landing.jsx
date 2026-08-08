@@ -3,26 +3,80 @@ import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import '../pages/dashboardGlass.css';
 
+const FEATURES = [
+  {
+    span: 2, kicker: 'Timeline', title: 'Journey Timeline',
+    body: "A single line through diagnosis, treatment and recovery — see where you've been and what's next.",
+    tag: 'Always up to date', tagCls: 'gl-tag',
+  },
+  {
+    span: 2, kicker: 'Assistant', title: 'AI Assistant',
+    body: 'Ask questions about symptoms or appointments any hour, and get answers grounded in your own chart.',
+    tag: 'Available 24/7', tagCls: 'gl-tag',
+  },
+  {
+    span: 1, kicker: 'People', title: 'Care Team',
+    body: 'Oncologists, nurses and caregivers, all reachable in one thread.',
+    tag: 'One inbox', tagCls: 'gl-tag-purple',
+  },
+  {
+    span: 1, kicker: 'Tracking', title: 'Medications & Symptoms',
+    body: 'Log doses and symptoms in seconds so patterns get caught early.',
+    tag: 'Daily use', tagCls: 'gl-tag-purple',
+  },
+  {
+    span: 2, kicker: 'Records', title: 'Documents',
+    body: 'Lab results, imaging and visit summaries in one place — no more chasing down paperwork between providers.',
+    tag: 'Always accessible', tagCls: 'gl-tag-mild',
+  },
+  {
+    span: 1, kicker: 'Access', title: 'Resources & Support',
+    body: 'Financial assistance, transportation and telehealth options.',
+    tag: 'Rural & underserved access', tagCls: 'gl-tag-mild',
+  },
+  {
+    span: 3, kicker: 'Locations', title: 'Hospital Finder',
+    body: 'Search any zip code to find nearby hospitals and cancer treatment centers, sorted by distance, on an interactive map — no account needed to try it.',
+    tag: 'No account needed', tagCls: 'gl-tag-accent',
+    link: { to: '/hospital-finder', label: 'Try it now →' },
+  },
+];
+
 export default function Landing() {
   return (
     <div className="gl-public">
       <Navbar />
 
-      <div className="ep-container" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 'var(--space-8)', alignItems: 'center', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
-        <div>
-          <h6 style={{ color: 'var(--color-accent-700)' }}>For patients, caregivers &amp; care teams</h6>
-          <h1 style={{ fontSize: 56, fontWeight: 400, marginTop: 'var(--space-2)' }}>Hope, organized around you.</h1>
-          <p style={{ fontSize: 17, maxWidth: '46ch', opacity: .85, marginTop: 'var(--space-3)' }}>Elpis brings your whole cancer journey into one quiet place — appointments, medications, symptoms and the people caring for you, gathered where you can find them, whether your care team is down the hall or an hour away.</p>
-          <div className="ep-btnrow" style={{ marginTop: 'var(--space-4)' }}>
-            <Link className="btn btn-primary" to="/register">Get started</Link>
-            <Link className="btn btn-ghost" to="/how-it-works">See how it works ›</Link>
+      <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
+        <div className="gl-blob" style={{ width: 320, height: 320, top: -60, right: '8%', background: 'radial-gradient(circle, rgba(126,211,183,.4), transparent 70%)', animation: 'gl-float 12s ease-in-out infinite' }} />
+        <div className="gl-blob" style={{ width: 220, height: 220, top: 220, left: '2%', background: 'radial-gradient(circle, rgba(140,180,210,.35), transparent 70%)', animation: 'gl-float2 15s ease-in-out infinite' }} />
+
+        <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: 'var(--space-8)', alignItems: 'center' }}>
+          <div>
+            <h6 style={{ color: 'var(--color-accent-700)' }}>For patients, caregivers &amp; care teams</h6>
+            <h1 style={{ fontSize: 64, fontWeight: 700, marginTop: 'var(--space-2)', lineHeight: 0.98, letterSpacing: '-0.02em' }}>
+              Hope,<br /><span style={{ color: '#1d7a5f' }}>organized</span><br />around you.
+            </h1>
+            <p style={{ fontSize: 17, maxWidth: '46ch', opacity: .8, marginTop: 'var(--space-4)' }}>Elpis brings your whole cancer journey into one quiet place — appointments, medications, symptoms and the people caring for you, gathered where you can find them, whether your care team is down the hall or an hour away.</p>
+            <div className="ep-btnrow" style={{ marginTop: 'var(--space-5)' }}>
+              <Link className="btn btn-primary" to="/register">Get started</Link>
+              <Link className="btn btn-ghost" to="/how-it-works">See how it works ›</Link>
+            </div>
+          </div>
+
+          <div className="gl-hero-frame" style={{ padding: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#1d7a5f' }} />
+              <span style={{ fontSize: 12, color: 'rgba(34,48,43,.6)' }}>Your dashboard, at a glance</span>
+            </div>
+            <div style={{ borderRadius: 16, overflow: 'hidden', position: 'relative', boxShadow: '0 10px 30px -12px rgba(20,60,52,.3)' }}>
+              <img src="/heart-hero.jpg" alt="" style={{ width: '100%', display: 'block', objectFit: 'cover', aspectRatio: '4/3' }} />
+              <div style={{ position: 'absolute', left: 12, bottom: 12, background: 'rgba(255,255,255,.9)', borderRadius: 10, padding: '6px 12px', fontSize: 11, fontWeight: 600, boxShadow: '0 4px 14px rgba(0,0,0,.12)' }}>
+                Treatment · Cycle 4
+              </div>
+            </div>
           </div>
         </div>
-        <figure className="plate" style={{ margin: 0 }}>
-          <div style={{ width: '100%', height: 360, background: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-neutral-500)', fontSize: 13 }}>
-            Patient portal preview
-          </div>
-        </figure>
       </div>
 
       <div className="hr ep-container" />
@@ -30,56 +84,25 @@ export default function Landing() {
       <div className="ep-container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
         <h6 style={{ color: 'var(--color-accent-700)' }}>A guide through treatment</h6>
         <h2 style={{ marginTop: 'var(--space-2)', maxWidth: '22ch' }}>Everything care requires, nothing it doesn't.</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
-          <div className="card elev-sm">
-            <span className="card-kicker">Timeline</span>
-            <h4 className="card-title">Journey Timeline</h4>
-            <p className="card-body">A single line through diagnosis, treatment and recovery — see where you've been and what's next.</p>
-            <span className="tag tag-accent">Always up to date</span>
-          </div>
-          <div className="card elev-sm">
-            <span className="card-kicker">Assistant</span>
-            <h4 className="card-title">AI Assistant</h4>
-            <p className="card-body">Ask questions about symptoms or appointments any hour, and get answers grounded in your own chart.</p>
-            <span className="tag tag-accent">Available 24/7</span>
-          </div>
-          <div className="card elev-sm">
-            <span className="card-kicker">People</span>
-            <h4 className="card-title">Care Team</h4>
-            <p className="card-body">Oncologists, nurses and caregivers, all reachable in one thread — no more calling five numbers.</p>
-            <span className="tag tag-accent-2">One inbox</span>
-          </div>
-          <div className="card elev-sm">
-            <span className="card-kicker">Tracking</span>
-            <h4 className="card-title">Medications &amp; Symptoms</h4>
-            <p className="card-body">Log doses and symptoms in seconds, so your care team catches patterns before they become emergencies.</p>
-            <span className="tag tag-accent-2">Built for daily use</span>
-          </div>
-          <div className="card elev-sm">
-            <span className="card-kicker">Records</span>
-            <h4 className="card-title">Documents</h4>
-            <p className="card-body">Lab results, imaging and visit summaries in one place — no more chasing down paperwork between providers.</p>
-            <span className="tag tag-neutral">Always accessible</span>
-          </div>
-          <div className="card elev-sm">
-            <span className="card-kicker">Access</span>
-            <h4 className="card-title">Resources &amp; Support</h4>
-            <p className="card-body">Financial assistance, transportation programs and telehealth options — because care shouldn't stop at the parking lot.</p>
-            <span className="tag tag-neutral">Built for rural &amp; underserved access</span>
-          </div>
-          <div className="card elev-sm">
-            <span className="card-kicker">Locations</span>
-            <h4 className="card-title">Hospital Finder</h4>
-            <p className="card-body">Search any zip code to find nearby hospitals and cancer treatment centers, sorted by distance, on an interactive map.</p>
-            <span className="tag tag-accent">No account needed</span>
-            <Link to="/hospital-finder" style={{ fontSize: 13, marginTop: 'var(--space-1)' }}>Try it now →</Link>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
+          {FEATURES.map((f) => (
+            <div key={f.title} className="gl-bento" style={{ gridColumn: `span ${f.span}` }}>
+              <span className="gl-kicker">{f.kicker}</span>
+              <h4 className="card-title">{f.title}</h4>
+              <p className="card-body" style={{ flex: 1 }}>{f.body}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span className={`gl-tag ${f.tagCls}`}>{f.tag}</span>
+                {f.link && <Link to={f.link.to} style={{ fontSize: 13, color: '#1d7a5f' }}>{f.link.label}</Link>}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div style={{ background: 'var(--color-surface)', padding: 'var(--space-8) 0' }}>
-        <div className="ep-container" style={{ maxWidth: 820, textAlign: 'center' }}>
-          <p style={{ fontFamily: 'var(--font-heading)', fontStyle: 'italic', fontSize: 26, fontWeight: 400, lineHeight: 1.3, margin: 0 }}>"For the first time since my diagnosis, I didn't feel like I was managing this alone."</p>
+      <div style={{ background: 'rgba(255,255,255,.5)', padding: 'var(--space-8) 0' }}>
+        <div className="ep-container" style={{ maxWidth: 760, textAlign: 'center' }}>
+          <div className="gl-quote-mark">&ldquo;</div>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 27, fontWeight: 600, lineHeight: 1.35, margin: '-24px 0 0', color: '#22302b' }}>For the first time since my diagnosis, I didn't feel like I was managing this alone.</p>
           <p className="text-muted" style={{ marginTop: 'var(--space-3)', fontSize: 13 }}>— Elpis patient, in treatment since 2025</p>
         </div>
       </div>
