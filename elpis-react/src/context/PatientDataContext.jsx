@@ -45,7 +45,10 @@ export function PatientDataProvider({ children }) {
       setHomeZipState(null);
       return;
     }
-    supabase.from('patients').select('id, home_zip').eq('profile_id', session.user.id).single()
+    // maybeSingle, not single — a caregiver account legitimately has zero
+    // rows here (there's no caregiver-to-patient linking system yet), and
+    // that should resolve to patientId: null quietly, not a 406 error.
+    supabase.from('patients').select('id, home_zip').eq('profile_id', session.user.id).maybeSingle()
       .then(({ data }) => {
         setPatientId(data?.id ?? null);
         setHomeZipState(data?.home_zip ?? null);

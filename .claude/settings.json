@@ -1,7 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git init *)"
+      "Bash(git init *)",
+      "WebFetch(domain:medicine.tulane.edu)",
+      "WebFetch(domain:www.ochsnerlsuhs.org)",
+      "WebFetch(domain:directory.wkhs.com)",
+      "WebFetch(domain:www.christushealth.org)",
+      "WebFetch(domain:www.lcmchealth.org)",
+      "WebSearch",
+      "WebFetch(domain:marybird.org)",
+      "WebFetch(domain:www.brgeneral.org)",
+      "WebFetch(domain:moorescancercenter.ucsd.edu)",
+      "WebFetch(domain:uscnorriscancer.usc.edu)",
+      "WebFetch(domain:www.opelousasgeneral.com)",
+      "WebFetch(domain:unmhealth.org)",
+      "WebFetch(domain:www.mhealthfairview.org)",
+      "WebFetch(domain:medium.com)"
     ]
   }
 }
