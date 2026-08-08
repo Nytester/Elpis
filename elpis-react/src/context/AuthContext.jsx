@@ -25,19 +25,23 @@ export function AuthProvider({ children }) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
+  const fetchProfile = async (userId) => {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    setProfile(data);
+    return data;
+  };
+
   useEffect(() => {
     if (!session) return;
     setLoading(true);
-    supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single()
-      .then(({ data }) => {
-        setProfile(data);
-        setLoading(false);
-      });
+    fetchProfile(session.user.id).then(() => setLoading(false));
   }, [session]);
+
+  // Lets a caller (e.g. Register.jsx after set_own_role) pull the freshly
+  // updated row back into memory — profile only auto-refetches on session
+  // change, so a role mutated via RPC otherwise stays stale here until a
+  // hard reload even though the database is already correct.
+  const refreshProfile = () => (session ? fetchProfile(session.user.id) : Promise.resolve(null));
 
   const signUp = async ({ email, password, fullName, role }) => {
     const { error } = await supabase.auth.signUp({
@@ -61,7 +65,7 @@ export function AuthProvider({ children }) {
   const signOut = () => supabase.auth.signOut();
 
   return (
-    <AuthContext.Provider value={{ session, profile, loading, signUp, signIn, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ session, profile, loading, signUp, signIn, signInWithGoogle, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

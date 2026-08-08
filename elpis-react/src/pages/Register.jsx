@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient.js';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { signUp, signInWithGoogle, session, profile } = useAuth();
+  const { signUp, signInWithGoogle, session, profile, refreshProfile } = useAuth();
   const [role, setRole] = useState('patient');
   const [form, setForm] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
   const [agreed, setAgreed] = useState(false);
@@ -24,13 +24,26 @@ export default function Register() {
     const pendingRole = sessionStorage.getItem('elpis_pending_role');
     const applyAndRedirect = async () => {
       if (pendingRole && pendingRole !== profile.role) {
-        await supabase.rpc('set_own_role', { new_role: pendingRole });
+        const { error: roleError } = await supabase.rpc('set_own_role', { new_role: pendingRole });
+        if (roleError) {
+          // Leave the pending flag in place so it's retried on next load
+          // instead of silently getting stuck as the trigger's default role.
+          console.error('[Register] set_own_role failed — role not applied:', roleError.message);
+          setErrors({ form: `Signed in, but couldn't set your role as ${pendingRole} (${roleError.message}). You can fix this from Settings, or contact support.` });
+          return;
+        }
         sessionStorage.removeItem('elpis_pending_role');
+        // profile only auto-refetches on session change, so without this the
+        // app keeps showing the pre-RPC role (e.g. sidebar tooltip) until a
+        // hard reload, even though the database is already correct.
+        const fresh = await refreshProfile();
+        navigate(fresh?.role === 'provider' ? '/provider' : '/dashboard');
+        return;
       }
       navigate(profile.role === 'provider' ? '/provider' : '/dashboard');
     };
     applyAndRedirect();
-  }, [session, profile, navigate]);
+  }, [session, profile, navigate, refreshProfile]);
 
   async function handleSubmit(e) {
     e.preventDefault();
