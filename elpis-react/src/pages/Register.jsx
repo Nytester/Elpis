@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { supabase } from '../lib/supabaseClient.js';
+import GoogleIcon from '../components/GoogleIcon.jsx';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -93,15 +94,6 @@ export default function Register() {
               </div>
             </div>
 
-            <button type="button" className="btn btn-secondary btn-block" onClick={handleGoogle} style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-              Continue with Google
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 'var(--space-3) 0' }}>
-              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
-              <span className="text-muted" style={{ fontSize: 12 }}>or</span>
-              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
-            </div>
-
             <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }} onSubmit={handleSubmit}>
               {errors.form && <div className="ep-err">{errors.form}</div>}
               <div className="field">
@@ -131,6 +123,17 @@ export default function Register() {
               {errors.agreed && <div className="ep-err">{errors.agreed}</div>}
               <button className="btn btn-primary btn-block" type="submit">Create account</button>
             </form>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 'var(--space-3) 0' }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
+              <span className="text-muted" style={{ fontSize: 12 }}>or</span>
+              <div style={{ flex: 1, height: 1, background: 'var(--color-divider)' }} />
+            </div>
+
+            <button type="button" className="btn btn-secondary btn-block" onClick={handleGoogle} style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-3)' }}><GoogleIcon/>
+              Continue with Google
+            </button>
+
             <p className="text-muted" style={{ textAlign: 'center', fontSize: 13, marginTop: 'var(--space-4)' }}>
               Already have an account? <Link to="/login" style={{ color: 'var(--color-accent-700)' }}>Log in</Link>
             </p>
