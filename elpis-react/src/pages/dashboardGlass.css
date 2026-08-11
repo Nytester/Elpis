@@ -115,6 +115,15 @@
     linear-gradient(180deg, rgba(242, 245, 243, .55) 0%, rgba(198, 212, 205, .6) 55%, rgba(182, 199, 190, .7) 100%),
     radial-gradient(1000px 650px at 80% 0%, rgba(126, 211, 183, .2), transparent 60%),
     url('/auth-bg.jpg') center 30% / cover no-repeat;
+  /* fixed, not scroll — on a page taller than one viewport, `cover` would
+     otherwise size against the *whole* (very tall) element instead of what's
+     actually visible, cropping the photo down to a useless sliver. */
+  background-attachment: fixed;
+}
+@media (max-width: 780px) {
+  /* iOS Safari doesn't support fixed backgrounds inside a scrolling body
+     reliably — fall back to normal scroll attachment there. */
+  .gl-public.gl-auth-bg { background-attachment: scroll; }
 }
 .gl-dash .seg, .gl-public .seg { border-radius: 999px; overflow: hidden; }
 .gl-public .plate { filter: none; border: 1px solid rgba(255, 255, 255, .85); border-radius: 18px; outline: none; }
@@ -365,6 +374,100 @@
 }
 .gl-bento > * { position: relative; z-index: 1; }
 .gl-bento:hover { transform: translateY(-4px); background: rgba(255,255,255,.28); box-shadow: 0 20px 40px -20px rgba(20,60,52,.35), inset 0 1px 0 rgba(255,255,255,.6); }
+
+/* Sticky-scroll feature sequence — left column lists all 7 steps (dimmed
+   until active), right column stays pinned and its card morphs to match.
+   Whichever step sits at the vertical center of the viewport is "active";
+   the .gl-feat-visual card remounts on change (React key), which is what
+   plays its enter animation below. */
+.gl-steps-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; position: relative; z-index: 1; }
+.gl-steps-list { display: flex; flex-direction: column; }
+.gl-step {
+  padding: 56px 0;
+  border-bottom: 1px solid rgba(34, 48, 43, .08);
+  opacity: .4;
+  cursor: pointer;
+  transition: opacity .35s ease;
+}
+.gl-step:first-child { padding-top: 0; }
+.gl-step:last-child { border-bottom: none; padding-bottom: 0; }
+.gl-step.active { opacity: 1; }
+.gl-step-num {
+  font-family: var(--font-heading); font-weight: 600; font-size: 13px;
+  color: rgba(34, 48, 43, .4); font-variant-numeric: tabular-nums;
+  transition: color .35s ease;
+}
+
+.gl-feat-heading { display: flex; align-items: center; gap: 10px; }
+.gl-feat-glyph { display: flex; color: #1d7a5f; flex-shrink: 0; transition: color .35s ease; }
+.gl-feat-glyph svg { width: 26px; height: 26px; }
+.gl-feat-heading h3 {
+  font-family: var(--font-heading); font-weight: 600;
+  font-size: 24px; line-height: 1.15; margin: 0; color: #16211d;
+}
+.gl-feat-body {
+  margin: 12px 0 0; max-width: 52ch;
+  font-size: 15px; line-height: 1.6; color: rgba(34, 48, 43, .72);
+}
+
+.gl-steps-sticky { position: sticky; top: 110px; }
+.gl-steps-sticky .gl-feat-visual {
+  min-height: 380px;
+  padding: 40px;
+  display: flex; align-items: center; justify-content: flex-start;
+  animation: gl-card-enter .38s cubic-bezier(.16,.84,.44,1) both;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.gl-steps-sticky .gl-feat-visual:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 26px 55px -22px rgba(20,60,52,.45), inset 0 1px 0 rgba(255,255,255,.6);
+}
+@keyframes gl-card-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Inner elements of the active card pop in with a short stagger — each
+   item sets --i (its index) inline, consumed here as an animation delay. */
+.gl-stagger-item {
+  animation: gl-stagger-pop .4s cubic-bezier(.16,.84,.44,1) both;
+  animation-delay: calc(var(--i, 0) * 100ms);
+}
+@keyframes gl-stagger-pop {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .gl-steps-wrap { grid-template-columns: 1fr; gap: 0; }
+  .gl-steps-sticky { position: static; margin-top: 24px; }
+  .gl-step { opacity: 1; padding: 32px 0; }
+}
+@media (max-width: 640px) {
+  .gl-feat-heading h3 { font-size: 20px; }
+  .gl-steps-sticky .gl-feat-visual { padding: 26px 22px; min-height: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-steps-sticky .gl-feat-visual, .gl-stagger-item { animation: none; }
+}
+
+/* Hospital Finder preview — a small dot cluster around a center "you" marker,
+   deliberately unlabeled (no invented hospital names/distances). */
+.gl-mini-radar { position: relative; width: 96px; height: 96px; flex-shrink: 0; --gl-radar-ring: rgba(29, 122, 95, .16); }
+.gl-mini-radar::before, .gl-mini-radar::after {
+  content: ''; position: absolute; border-radius: 50%; border: 1px solid var(--gl-radar-ring);
+}
+.gl-mini-radar::before { inset: 0; }
+.gl-mini-radar::after { inset: 20px; }
+.gl-mini-radar-you {
+  position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; margin: -5px;
+  border-radius: 50%; background: #16211d;
+}
+.gl-mini-radar-dot {
+  position: absolute; width: 9px; height: 9px; margin: -4.5px;
+  border-radius: 50%; background: #1d7a5f;
+  box-shadow: 0 0 0 3px rgba(29, 122, 95, .18);
+}
 .gl-quote-mark { font-family: 'DM Sans', sans-serif; font-size: 72px; font-weight: 700; color: rgba(29,122,95,.18); line-height: 1; }
 .gl-quote-panel {
   background: rgba(255, 255, 255, .14);
@@ -373,3 +476,40 @@
   border-bottom: 1px solid rgba(255, 255, 255, .4);
 }
 .gl-seg-opt:not(.selected):hover { background: rgba(255,255,255,.7); }
+
+/* Blog list — each post is its own glass card (.gl-hero-frame) rather than
+   rows sharing one panel; this adds the click-affordance hover on top. */
+.gl-blog-card {
+  transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+}
+.gl-blog-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, .24);
+  box-shadow: 0 26px 55px -24px rgba(20,60,52,.4), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.gl-blog-featured { padding: var(--space-8, 40px) !important; }
+
+/* Editorial pull-quote — used both on the featured card and mid-article on
+   the post page itself, always a real line lifted from that post's own
+   body copy (see `pullQuote` in blogPosts.js), never separate marketing text. */
+.gl-pullquote {
+  margin: 0; padding-left: 20px;
+  border-left: 3px solid #1d7a5f;
+  font-family: 'Instrument Serif', serif; font-style: italic;
+  font-size: 24px; line-height: 1.4; color: #16211d;
+}
+
+/* Drop cap on the opening paragraph of a post. */
+.gl-dropcap::first-letter {
+  font-family: 'Instrument Serif', serif; font-style: italic;
+  font-size: 64px; line-height: 1; font-weight: 400;
+  float: left; padding: 4px 8px 0 0; color: #1d7a5f;
+}
+
+/* Prev/next footer nav between posts. */
+.gl-post-nav {
+  display: block; text-decoration: none; color: inherit;
+  padding: var(--space-5) var(--space-6);
+}
+.gl-post-nav .gl-kicker { display: block; margin-bottom: 6px; }
+.gl-post-nav h4 { margin: 0; font-size: 19px; font-weight: 600; font-family: var(--font-heading); }
