@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { BLOG_POSTS } from '../lib/blogPosts.js';
+import './dashboardGlass.css';
 
 const CheckIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', marginTop: 2 }}>
@@ -22,20 +23,20 @@ function Feature({ children }) {
 function PlanCard({ kicker, name, price, priceNote, features, cta, highlighted, secondaryCta }) {
   return (
     <div
-      className={`card ${highlighted ? 'elev-md' : 'elev-sm'}`}
+      className={highlighted ? 'gl-hero-frame gl-blog-card' : 'card elev-sm'}
       style={{
         position: 'relative',
+        display: 'flex', flexDirection: 'column',
         padding: 'var(--space-6) var(--space-5)',
         gap: 'var(--space-4)',
         borderRadius: 14,
-        borderColor: highlighted ? 'var(--color-accent)' : 'var(--color-divider)',
-        borderWidth: highlighted ? 2 : 1,
+        ...(highlighted ? {} : { borderColor: 'var(--color-divider)', borderWidth: 1 }),
       }}
     >
       {highlighted && (
         <span
           className="tag tag-accent"
-          style={{ position: 'absolute', top: -12, left: 'var(--space-5)', padding: '4px 12px' }}
+          style={{ alignSelf: 'flex-start', padding: '4px 12px' }}
         >
           Most popular
         </span>
@@ -99,17 +100,22 @@ const VOICES = [
 
 export default function Pricing() {
   return (
-    <>
-      <Navbar />
-
-      <div className="ep-container" style={{ maxWidth: 680, textAlign: 'center', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-6)' }}>
-        <h1 style={{ fontSize: 52, fontWeight: 400, lineHeight: 1.06 }}>Support a calmer cancer journey.</h1>
-        <p style={{ fontSize: 17, opacity: .8, marginTop: 'var(--space-3)', maxWidth: '52ch', marginLeft: 'auto', marginRight: 'auto' }}>
-          Elpis brings your whole cancer journey into one quiet place, free for every patient and caregiver — join to see how your own care could look organized.
-        </p>
-        <div className="ep-btnrow" style={{ justifyContent: 'center', marginTop: 'var(--space-4)' }}>
-          <Link className="btn btn-primary" to="/register">Get started</Link>
-          <a className="btn btn-ghost" href="#plans">View plans</a>
+    <div className="gl-public">
+      <div className="gl-hero-scene">
+        <Navbar />
+        <div className="ep-container" style={{ position: 'relative', zIndex: 1, maxWidth: 680, textAlign: 'center', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
+          <div className="gl-hero-scrim" aria-hidden="true" />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <span className="gl-hero-eyebrow">Free for patients &amp; caregivers</span>
+            <h1 className="gl-hero-title" style={{ fontSize: 48 }}>Support a calmer<br /><em>cancer journey.</em></h1>
+            <p className="gl-hero-sub" style={{ margin: 'var(--space-4) auto 0' }}>
+              Elpis brings your whole cancer journey into one quiet place, free for every patient and caregiver — join to see how your own care could look organized.
+            </p>
+            <div className="ep-btnrow" style={{ justifyContent: 'center', marginTop: 'var(--space-5)' }}>
+              <Link className="btn btn-primary" to="/register">Get started</Link>
+              <a className="btn btn-ghost" href="#plans">View plans</a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -232,6 +238,6 @@ export default function Pricing() {
 
       <div className="hr ep-container" />
       <Footer />
-    </>
+    </div>
   );
 }
