@@ -296,13 +296,17 @@
    below is invisible. */
 .gl-hero-scene {
   position: relative;
+  --gl-hero-img: url('/hero-meadow.jpg');
+  --gl-hero-pos: center 30%;
   /* The fade-out lands on #f2f5f3 — the exact top color of .gl-public's own
      background gradient — and reaches full opacity before the section ends,
      so the photo dissolves into the page instead of cutting off at a hard
-     edge (matches how the reference site fades its hero photo to white). */
+     edge (matches how the reference site fades its hero photo to white).
+     --gl-hero-img/--gl-hero-pos let other pages reuse this exact recipe
+     with their own photo instead of duplicating the whole rule. */
   background:
     linear-gradient(180deg, rgba(242, 245, 243, .12) 0%, rgba(242, 245, 243, .5) 55%, rgba(242, 245, 243, .88) 82%, #f2f5f3 100%),
-    url('/hero-meadow.jpg') center 30% / cover no-repeat;
+    var(--gl-hero-img) var(--gl-hero-pos) / cover no-repeat;
 }
 /* Soft frosted pool sitting behind the headline/subtext/buttons only (not
    the nav or the window card below) — the photo is busiest right where the
