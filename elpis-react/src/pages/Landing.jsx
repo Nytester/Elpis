@@ -45,42 +45,36 @@ const FEATURES = [
 export default function Landing() {
   return (
     <div className="gl-public">
-      <Navbar />
+      <div className="gl-hero-scene">
+        <Navbar />
 
-      <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
-        <div className="gl-blob" style={{ width: 420, height: 420, top: -100, right: '4%', background: 'radial-gradient(circle, rgba(126,211,183,.55), transparent 70%)', animation: 'gl-float 12s ease-in-out infinite' }} />
-        <div className="gl-blob" style={{ width: 320, height: 320, top: 200, left: '-4%', background: 'radial-gradient(circle, rgba(140,180,210,.5), transparent 70%)', animation: 'gl-float2 15s ease-in-out infinite' }} />
-        <div className="gl-blob" style={{ width: 260, height: 260, top: 520, right: '22%', background: 'radial-gradient(circle, rgba(29,122,95,.3), transparent 70%)', animation: 'gl-float 18s ease-in-out infinite' }} />
-
-        <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: 'var(--space-8)', alignItems: 'center' }}>
-          <div>
-            <h6 style={{ color: 'var(--color-accent-700)' }}>For patients, caregivers &amp; care teams</h6>
-            <h1 style={{ fontSize: 64, fontWeight: 700, marginTop: 'var(--space-2)', lineHeight: 0.98, letterSpacing: '-0.02em' }}>
-              Hope,<br /><span style={{ color: '#1d7a5f' }}>organized</span><br />around you.
+        <div className="ep-container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', paddingTop: 'var(--space-8)', maxWidth: 760 }}>
+          <div className="gl-hero-scrim" aria-hidden="true" />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <span className="gl-hero-eyebrow">For patients, caregivers &amp; care teams</span>
+            <h1 className="gl-hero-title">
+              Your care,<br /><em>organized around you.</em>
             </h1>
-            <p style={{ fontSize: 17, maxWidth: '46ch', opacity: .8, marginTop: 'var(--space-4)' }}>Elpis brings your whole cancer journey into one quiet place — appointments, medications, symptoms and the people caring for you, gathered where you can find them, whether your care team is down the hall or an hour away.</p>
-            <div className="ep-btnrow" style={{ marginTop: 'var(--space-5)' }}>
-              <Link className="btn btn-primary" to="/register">Get started</Link>
-              <Link className="btn btn-ghost" to="/how-it-works">See how it works ›</Link>
-            </div>
-          </div>
-
-          <div className="gl-hero-frame" style={{ padding: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#1d7a5f' }} />
-              <span style={{ fontSize: 12, color: 'rgba(34,48,43,.6)' }}>Your dashboard, at a glance</span>
-            </div>
-            <div style={{ borderRadius: 16, overflow: 'hidden', position: 'relative', boxShadow: '0 10px 30px -12px rgba(20,60,52,.3)' }}>
-              <img src="/heart-hero.jpg" alt="" style={{ width: '100%', display: 'block', objectFit: 'cover', aspectRatio: '4/3' }} />
-              <div style={{ position: 'absolute', left: 12, bottom: 12, background: 'rgba(255,255,255,.9)', borderRadius: 10, padding: '6px 12px', fontSize: 11, fontWeight: 600, boxShadow: '0 4px 14px rgba(0,0,0,.12)' }}>
-                Treatment · Cycle 4
-              </div>
+            <p className="gl-hero-sub">Elpis brings your whole cancer journey into one quiet place — appointments, medications, symptoms and the people caring for you, gathered where you can find them.</p>
+            <div className="ep-btnrow" style={{ justifyContent: 'center', marginTop: 'var(--space-5)' }}>
+              <Link className="btn btn-primary" to="/register">Get started →</Link>
+              <Link className="btn btn-ghost" to="/how-it-works">See how it works →</Link>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="hr ep-container" />
+        <div className="ep-container" style={{ position: 'relative', zIndex: 1, paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
+          <div className="gl-hero-frame gl-window-frame">
+            <div className="gl-window-bar">
+              <span className="gl-window-dot" style={{ background: '#ff5f57' }} />
+              <span className="gl-window-dot" style={{ background: '#febc2e' }} />
+              <span className="gl-window-dot" style={{ background: '#28c840' }} />
+              <span style={{ marginLeft: 8, fontSize: 12, color: 'rgba(34,48,43,.55)' }}>Your dashboard, at a glance</span>
+            </div>
+            <div style={{ aspectRatio: '16/7', background: 'linear-gradient(160deg, #cfe9df 0%, #e8f2ee 60%, #f2f5f3 100%)' }} />
+          </div>
+        </div>
+      </div>
 
       <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
         <div className="gl-blob" style={{ width: 300, height: 300, top: 40, right: '-2%', background: 'radial-gradient(circle, rgba(140,180,210,.4), transparent 70%)', animation: 'gl-float2 16s ease-in-out infinite' }} />

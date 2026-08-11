@@ -281,27 +281,95 @@
 @keyframes gl-float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-12px, -22px) rotate(4deg); } }
 @keyframes gl-float2 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(14px, -16px) rotate(-3deg); } }
 .gl-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
+
+/* Full-bleed hero — real meadow photograph behind a mint-tinted wash, fading
+   into the page's own gradient at the bottom so the seam with the section
+   below is invisible. */
+.gl-hero-scene {
+  position: relative;
+  /* The fade-out lands on #f2f5f3 — the exact top color of .gl-public's own
+     background gradient — and reaches full opacity before the section ends,
+     so the photo dissolves into the page instead of cutting off at a hard
+     edge (matches how the reference site fades its hero photo to white). */
+  background:
+    linear-gradient(180deg, rgba(242, 245, 243, .12) 0%, rgba(242, 245, 243, .5) 55%, rgba(242, 245, 243, .88) 82%, #f2f5f3 100%),
+    url('/hero-meadow.jpg') center 30% / cover no-repeat;
+}
+/* Soft frosted pool sitting behind the headline/subtext/buttons only (not
+   the nav or the window card below) — the photo is busiest right where the
+   text sits, so this is what actually buys readability; the gradient fade
+   in .gl-hero-scene alone left too much photo showing through up top. */
+.gl-hero-scrim {
+  position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%);
+  width: 880px; max-width: 160%; height: 460px;
+  background: radial-gradient(ellipse at center, rgba(242,245,243,.92) 0%, rgba(242,245,243,.7) 45%, rgba(242,245,243,0) 75%);
+  pointer-events: none; z-index: 0;
+}
+.gl-hero-eyebrow {
+  display: inline-flex; align-items: center;
+  background: rgba(255, 255, 255, .7);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, .8);
+  border-radius: 999px; padding: 7px 16px;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500;
+  color: #145c47; letter-spacing: .01em;
+}
+.gl-hero-title {
+  font-family: 'Instrument Serif', serif; font-weight: 400;
+  font-size: 60px; line-height: 1.08; letter-spacing: -0.01em;
+  margin: var(--space-4) 0 0; color: #16211d;
+  text-wrap: balance;
+  text-shadow: 0 2px 24px rgba(242,245,243,.6);
+}
+.gl-hero-title em { font-style: italic; color: #1d7a5f; }
+.gl-hero-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 17px; color: rgba(22, 33, 29, .8);
+  max-width: 52ch; margin: var(--space-4) auto 0; line-height: 1.55;
+}
+.gl-window-frame { text-align: left; }
+.gl-window-bar {
+  display: flex; align-items: center; gap: 7px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, .4);
+}
+.gl-window-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+@media (max-width: 640px) {
+  .gl-hero-title { font-size: 40px; }
+}
 .gl-hero-frame {
   position: relative; border-radius: 22px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,.6); box-shadow: 0 30px 70px -30px rgba(20,60,52,.35);
-  background: rgba(255, 255, 255, .3);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, .16);
+  backdrop-filter: blur(26px) saturate(160%); -webkit-backdrop-filter: blur(26px) saturate(160%);
+  border: 1px solid rgba(255,255,255,.45);
+  border-top-color: rgba(255,255,255,.75); border-left-color: rgba(255,255,255,.6);
+  box-shadow: 0 30px 70px -30px rgba(20,60,52,.4), inset 0 1px 0 rgba(255,255,255,.55), inset 0 0 40px rgba(255,255,255,.06);
+}
+.gl-hero-frame::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(160deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 45%);
 }
 .gl-bento {
-  position: relative; z-index: 1;
+  position: relative; z-index: 1; overflow: hidden;
   border-radius: 20px; padding: 22px;
-  background: rgba(255,255,255,.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,.6);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, .07);
+  background: rgba(255,255,255,.16);
+  backdrop-filter: blur(26px) saturate(160%); -webkit-backdrop-filter: blur(26px) saturate(160%);
+  border: 1px solid rgba(255,255,255,.45);
+  border-top-color: rgba(255,255,255,.75); border-left-color: rgba(255,255,255,.6);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, .1), inset 0 1px 0 rgba(255,255,255,.55);
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
   display: flex; flex-direction: column; gap: 8px;
 }
-.gl-bento:hover { transform: translateY(-4px); background: rgba(255,255,255,.55); box-shadow: 0 20px 40px -20px rgba(20,60,52,.3); }
+.gl-bento::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(160deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 45%);
+}
+.gl-bento > * { position: relative; z-index: 1; }
+.gl-bento:hover { transform: translateY(-4px); background: rgba(255,255,255,.28); box-shadow: 0 20px 40px -20px rgba(20,60,52,.35), inset 0 1px 0 rgba(255,255,255,.6); }
 .gl-quote-mark { font-family: 'DM Sans', sans-serif; font-size: 72px; font-weight: 700; color: rgba(29,122,95,.18); line-height: 1; }
 .gl-quote-panel {
-  background: rgba(255, 255, 255, .3);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border-top: 1px solid rgba(255, 255, 255, .5);
-  border-bottom: 1px solid rgba(255, 255, 255, .5);
+  background: rgba(255, 255, 255, .14);
+  backdrop-filter: blur(26px) saturate(160%); -webkit-backdrop-filter: blur(26px) saturate(160%);
+  border-top: 1px solid rgba(255, 255, 255, .55);
+  border-bottom: 1px solid rgba(255, 255, 255, .4);
 }
 .gl-seg-opt:not(.selected):hover { background: rgba(255,255,255,.7); }
