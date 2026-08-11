@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { supabase } from '../lib/supabaseClient.js';
 import GoogleIcon from '../components/GoogleIcon.jsx';
+import './dashboardGlass.css';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -72,9 +73,9 @@ export default function Register() {
   };
 
   return (
-    <div className="ep-shell">
-      <Link to="/" className="ep-logo" style={{ fontSize: 26, marginBottom: 'var(--space-6)', textDecoration: 'none' }}>Elpis</Link>
-      <div className="card elev-md" style={{ padding: 'var(--space-6)', width: '100%', maxWidth: 440 }}>
+    <div className="ep-shell gl-public gl-auth-bg" style={{ position: 'relative', overflow: 'hidden' }}>
+      <Link to="/" className="ep-logo" style={{ position: 'relative', zIndex: 1, fontSize: 26, marginBottom: 'var(--space-6)', textDecoration: 'none' }}>Elpis</Link>
+      <div className="card ep-authcard-wide elev-md" style={{ position: 'relative', zIndex: 1, padding: 'var(--space-6)', width: '100%', maxWidth: 440 }}>
         {!submitting ? (
           <>
             <h2 style={{ fontSize: 26, textAlign: 'center' }}>Create your account</h2>

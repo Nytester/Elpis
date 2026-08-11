@@ -48,8 +48,9 @@ export default function Landing() {
       <Navbar />
 
       <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
-        <div className="gl-blob" style={{ width: 320, height: 320, top: -60, right: '8%', background: 'radial-gradient(circle, rgba(126,211,183,.4), transparent 70%)', animation: 'gl-float 12s ease-in-out infinite' }} />
-        <div className="gl-blob" style={{ width: 220, height: 220, top: 220, left: '2%', background: 'radial-gradient(circle, rgba(140,180,210,.35), transparent 70%)', animation: 'gl-float2 15s ease-in-out infinite' }} />
+        <div className="gl-blob" style={{ width: 420, height: 420, top: -100, right: '4%', background: 'radial-gradient(circle, rgba(126,211,183,.55), transparent 70%)', animation: 'gl-float 12s ease-in-out infinite' }} />
+        <div className="gl-blob" style={{ width: 320, height: 320, top: 200, left: '-4%', background: 'radial-gradient(circle, rgba(140,180,210,.5), transparent 70%)', animation: 'gl-float2 15s ease-in-out infinite' }} />
+        <div className="gl-blob" style={{ width: 260, height: 260, top: 520, right: '22%', background: 'radial-gradient(circle, rgba(29,122,95,.3), transparent 70%)', animation: 'gl-float 18s ease-in-out infinite' }} />
 
         <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: 'var(--space-8)', alignItems: 'center' }}>
           <div>
@@ -81,10 +82,12 @@ export default function Landing() {
 
       <div className="hr ep-container" />
 
-      <div className="ep-container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
-        <h6 style={{ color: 'var(--color-accent-700)' }}>A guide through treatment</h6>
-        <h2 style={{ marginTop: 'var(--space-2)', maxWidth: '22ch' }}>Everything care requires, nothing it doesn't.</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
+      <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
+        <div className="gl-blob" style={{ width: 300, height: 300, top: 40, right: '-2%', background: 'radial-gradient(circle, rgba(140,180,210,.4), transparent 70%)', animation: 'gl-float2 16s ease-in-out infinite' }} />
+        <div className="gl-blob" style={{ width: 260, height: 260, bottom: -40, left: '10%', background: 'radial-gradient(circle, rgba(126,211,183,.4), transparent 70%)', animation: 'gl-float 14s ease-in-out infinite' }} />
+        <h6 style={{ position: 'relative', zIndex: 1, color: 'var(--color-accent-700)' }}>A guide through treatment</h6>
+        <h2 style={{ position: 'relative', zIndex: 1, marginTop: 'var(--space-2)', maxWidth: '22ch' }}>Everything care requires, nothing it doesn't.</h2>
+        <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
           {FEATURES.map((f) => (
             <div key={f.title} className="gl-bento" style={{ gridColumn: `span ${f.span}` }}>
               <span className="gl-kicker">{f.kicker}</span>
@@ -99,7 +102,7 @@ export default function Landing() {
         </div>
       </div>
 
-      <div style={{ background: 'rgba(255,255,255,.5)', padding: 'var(--space-8) 0' }}>
+      <div className="gl-quote-panel" style={{ padding: 'var(--space-8) 0' }}>
         <div className="ep-container" style={{ maxWidth: 760, textAlign: 'center' }}>
           <div className="gl-quote-mark">&ldquo;</div>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 27, fontWeight: 600, lineHeight: 1.35, margin: '-24px 0 0', color: '#22302b' }}>For the first time since my diagnosis, I didn't feel like I was managing this alone.</p>
