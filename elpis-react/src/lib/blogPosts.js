@@ -6,6 +6,9 @@ export const BLOG_POSTS = [
     title: 'How Elpis Began',
     date: 'July 22, 2026',
     excerpt: "Why we built Elpis: not another standalone tool, but one connected place for everything that happens between appointments — where cancer care actually gets hard.",
+    // Verbatim line from the body below (paragraph 7), used as the pull-quote
+    // in the featured card and mid-article break — not separate copy.
+    pullQuote: 'No one should ever feel lost during their cancer journey.',
     body: [
       "Elpis began with a simple question: Why is the cancer journey still so overwhelming, even with today's incredible advances in medicine? Every year, breakthroughs in cancer research continue to improve diagnosis, treatment, and survival rates. Yet for millions of patients and their families, the experience of navigating cancer remains deeply complex and emotionally exhausting. A diagnosis doesn't just introduce medical challenges—it brings uncertainty, fear, endless appointments, difficult decisions, unfamiliar terminology, insurance paperwork, medication schedules, and the responsibility of coordinating care across multiple providers. For many, it can feel like managing a full-time job while fighting for their health.",
       "As we explored the realities of cancer care, one thing became increasingly clear: the problem wasn't a lack of medical expertise. Healthcare professionals dedicate their lives to caring for patients, and hospitals have access to remarkable technology and treatments. The challenge lies in everything that happens between appointments—the moments when patients return home with unanswered questions, caregivers struggle to coordinate daily responsibilities, or families simply don't know what comes next. These gaps often leave patients feeling isolated and overwhelmed during one of the most vulnerable periods of their lives.",
@@ -22,6 +25,9 @@ export const BLOG_POSTS = [
     title: 'Finding the Right Partner',
     date: 'July 22, 2026',
     excerpt: "Before there was Elpis, there was a DevDays teammate, a summer of side conversations, and one question that changed everything: what would we build if a hospital asked us to solve this tomorrow?",
+    // Verbatim line from the body below (paragraph 7) — the question that
+    // reframed the whole project, quoted there too.
+    pullQuote: 'What would we build if a hospital asked us to solve this problem tomorrow?',
     body: [
       'Every great project begins with an idea, but turning that idea into something real almost always requires the right people. For Elpis, that journey started long before we wrote a single line of code.',
       'I first met Prabhakar Shrestha during the 2025 Nexus Louisiana DevDays competition, where we worked together on StepSight AI, a project focused on supporting ACL injury recovery. Our goal was to explore how artificial intelligence could help patients better understand their rehabilitation process by providing insights and guidance throughout recovery. Like many student teams, we spent countless hours brainstorming ideas, solving technical challenges, and preparing our final presentation. More importantly, we learned how each of us approached problems, communicated under pressure, and worked through setbacks as a team.',
