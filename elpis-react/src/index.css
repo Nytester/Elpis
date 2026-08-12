@@ -250,6 +250,7 @@ textarea.input { min-height: 90px; resize: vertical; }
    frosted card inset from the edge (not a flush full-height panel), rather
    than the earlier flat icon strip. */
 .ep-sidebar {
+  position: relative; z-index: 30;
   margin: var(--space-4) 0 var(--space-4) var(--space-4);
   background: color-mix(in srgb, var(--color-bg) 55%, transparent);
   border: 1px solid color-mix(in srgb, #fff 80%, transparent);
@@ -271,13 +272,13 @@ textarea.input { min-height: 90px; resize: vertical; }
 .ep-navitem.active { background: color-mix(in srgb, #fff 95%, transparent); color: var(--color-accent-700); box-shadow: 0 2px 8px color-mix(in srgb, var(--color-neutral-900) 12%, transparent); }
 .ep-navitem svg { flex: none; width: 18px; height: 18px; }
 .ep-navitem .ep-navlabel {
-  position: absolute; left: calc(100% + 12px); top: 50%; transform: translate(-6px, -50%);
+  position: absolute; left: 50%; top: calc(100% + 8px); transform: translate(-50%, -6px);
   background: var(--color-neutral-900); color: var(--color-bg); font-size: 12px; font-weight: 500;
   padding: 6px 11px; border-radius: var(--radius-md); white-space: nowrap;
   opacity: 0; pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease;
   z-index: 50; box-shadow: var(--shadow-md);
 }
-.ep-navitem:hover .ep-navlabel, .ep-navitem:focus-visible .ep-navlabel { opacity: 1; transform: translate(0, -50%); }
+.ep-navitem:hover .ep-navlabel, .ep-navitem:focus-visible .ep-navlabel { opacity: 1; transform: translate(-50%, 0); }
 .ep-main { padding: var(--space-6) var(--space-8); }
 .ep-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-4); }
 .ep-medrow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--color-divider); }
