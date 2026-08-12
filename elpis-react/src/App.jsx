@@ -15,6 +15,7 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ClaimInvite from './pages/ClaimInvite.jsx';
+import PatientOnboarding from './pages/PatientOnboarding.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import CareTeam from './pages/CareTeam.jsx';
 import Hope from './pages/Hope.jsx';
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/claim" element={<ClaimInvite />} />
+          <Route path="/onboarding" element={<PatientOnboarding />} />
 
           <Route path="/dashboard" element={<RequireRole roles={PATIENT_ROLES}><Dashboard /></RequireRole>} />
           <Route path="/dashboard/care-team" element={<RequireRole roles={PATIENT_ROLES}><CareTeam /></RequireRole>} />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { supabase } from '../lib/supabaseClient.js';
 import GoogleIcon from '../components/GoogleIcon.jsx';
 import './dashboardGlass.css';
 
@@ -13,8 +14,20 @@ export default function Login() {
 
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
+  // A Google-registered patient who closed the browser mid-onboarding (see
+  // PatientOnboarding.jsx) still has no `patients` row — send them back to
+  // finish that instead of a dashboard with nothing to show.
   useEffect(() => {
-    if (session && profile) navigate(profile.role === 'provider' ? '/provider' : '/dashboard');
+    if (!session || !profile) return;
+    if (profile.role === 'provider') { navigate('/provider'); return; }
+    const isGoogle = session.user.app_metadata?.provider === 'google';
+    if (profile.role === 'patient' && isGoogle) {
+      supabase.from('patients').select('id').eq('profile_id', session.user.id).maybeSingle().then(({ data }) => {
+        navigate(data ? '/dashboard' : '/onboarding');
+      });
+      return;
+    }
+    navigate('/dashboard');
   }, [session, profile, navigate]);
 
   async function handleSubmit(e) {
@@ -76,9 +89,6 @@ export default function Login() {
             
             <p className="text-muted" style={{ textAlign: 'center', fontSize: 13, marginTop: 'var(--space-4)' }}>
               Don't have an account? <Link to="/register" style={{ color: 'var(--color-accent-700)' }}>Register</Link>
-            </p>
-            <p className="text-muted" style={{ textAlign: 'center', fontSize: 12, marginTop: 'var(--space-2)' }}>
-              Care team member? <Link to="/provider" style={{ color: 'var(--color-accent-700)' }}>View provider dashboard</Link>
             </p>
           </>
         ) : (

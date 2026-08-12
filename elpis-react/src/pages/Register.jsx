@@ -21,6 +21,21 @@ export default function Register() {
   // way — it's stashed here (same trick ClaimInvite.jsx uses for its invite
   // token) and applied via set_own_role() once the session reappears, before
   // redirecting into the dashboard.
+  // Google-registered patients skip the email form entirely, so they've never
+  // given us a phone/address/zip — and more importantly, provider_create_patient_with_invite
+  // is the only thing that normally creates a `patients` row, so a self-registered
+  // patient has none at all yet. Route them through /onboarding once (which also
+  // creates that row) instead of straight to a dashboard that has nothing to show.
+  const routeAfterAuth = async (role) => {
+    if (role === 'provider') { navigate('/provider'); return; }
+    const isGoogle = session.user.app_metadata?.provider === 'google';
+    if (role === 'patient' && isGoogle) {
+      const { data: existingPatient } = await supabase.from('patients').select('id').eq('profile_id', session.user.id).maybeSingle();
+      if (!existingPatient) { navigate('/onboarding'); return; }
+    }
+    navigate('/dashboard');
+  };
+
   useEffect(() => {
     if (!session || !profile) return;
     const pendingRole = sessionStorage.getItem('elpis_pending_role');
@@ -39,12 +54,13 @@ export default function Register() {
         // app keeps showing the pre-RPC role (e.g. sidebar tooltip) until a
         // hard reload, even though the database is already correct.
         const fresh = await refreshProfile();
-        navigate(fresh?.role === 'provider' ? '/provider' : '/dashboard');
+        await routeAfterAuth(fresh?.role);
         return;
       }
-      navigate(profile.role === 'provider' ? '/provider' : '/dashboard');
+      await routeAfterAuth(profile.role);
     };
     applyAndRedirect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, profile, navigate, refreshProfile]);
 
   async function handleSubmit(e) {
