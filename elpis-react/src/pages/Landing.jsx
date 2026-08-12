@@ -279,8 +279,15 @@ function StickyFeatureSteps() {
         })}
       </div>
       <div className="gl-steps-sticky">
-        <div key={active} className="gl-hero-frame gl-feat-visual">
-          <FeatureVisual type={activeFeature.icon} accent={activeAccent} />
+        <div key={active} className="gl-hero-frame gl-window-frame gl-feat-visual">
+          <div className="gl-window-bar">
+            <span className="gl-window-dot" style={{ background: '#ff5f57' }} />
+            <span className="gl-window-dot" style={{ background: '#febc2e' }} />
+            <span className="gl-window-dot" style={{ background: '#28c840' }} />
+          </div>
+          <div className="gl-feat-visual-body">
+            <FeatureVisual type={activeFeature.icon} accent={activeAccent} />
+          </div>
         </div>
       </div>
     </div>
