@@ -29,7 +29,50 @@ const ICONS = {
   pin: (
     <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /><circle cx="12" cy="9.5" r="2.4" stroke="currentColor" strokeWidth="1.6" /></svg>
   ),
+  patient: (
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.6" /><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+  ),
 };
+
+// "Everyone in the loop" — patient/caregiver/care-team cards linked by
+// curved connector lines meeting at one point. Solid-white polaroid cards
+// (opaque, shadow-only edge, no blur) — the one section on this page that
+// deliberately steps outside the glass system, by request.
+const CONNECTED = [
+  { icon: 'patient', name: 'Patient', desc: 'Logs symptoms, sees the Journey Timeline, messages the care team directly.', cls: 'card--patient' },
+  { icon: 'people', name: 'Caregiver', desc: 'Follows along, helps track medications, and steps in without re-asking every detail.', cls: 'card--caregiver' },
+  { icon: 'assistant', name: 'Care team', desc: 'Oncologists and nurse navigators see updates in real time, no phone tag required.', cls: 'card--team' },
+];
+
+function ConnectedCareSection() {
+  return (
+    <div className="ep-container gl-connect-scene">
+      <div className="gl-connect-head">
+        <span className="gl-kicker">Always connected</span>
+        <h2 className="gl-connect-title">Care doesn&apos;t happen<br /><em>in one place —</em><br />neither should the record of it.</h2>
+        <p>Patients, caregivers and care teams each see the same picture, updated as it happens.</p>
+      </div>
+
+      <div className="gl-connect-canvas">
+        <svg className="gl-connect-lines" viewBox="0 0 880 380" role="img" aria-label="Three connected cards: Patient, Caregiver, and Care Team, linked by curved lines meeting at a shared center point">
+          <path className="gl-connect-path" d="M 160 90 Q 340 40, 440 190" />
+          <path className="gl-connect-path" d="M 720 100 Q 560 50, 440 190" />
+          <path className="gl-connect-path" d="M 350 300 Q 400 240, 440 190" />
+          <circle className="gl-connect-node" cx="440" cy="190" r="5" />
+          <circle className="gl-connect-node-ring" cx="440" cy="190" r="11" />
+        </svg>
+
+        {CONNECTED.map((c) => (
+          <div key={c.name} className={`gl-connect-card ${c.cls}`}>
+            <div className="gl-connect-icon">{ICONS[c.icon]}</div>
+            <h4>{c.name}</h4>
+            <p>{c.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // A rotating cast of accent hues — one per feature panel, borrowed from tags
 // already used elsewhere in the app (mint/gold/purple/sky) — so the seven
@@ -244,6 +287,132 @@ function StickyFeatureSteps() {
   );
 }
 
+const PARTNERS = [
+  { name: 'Ochsner Health', desc: 'Cancer Care & Prevention Challenge healthcare partner', logo: '/ochsner-logo.png' },
+  { name: 'Nexus Louisiana', desc: 'DevDays Challenge organizer', logo: '/nexus-logo.png' },
+];
+
+// Infinite marquee — the track renders PARTNERS twice back-to-back and
+// animates exactly -50% of its own width, so the seam between the first
+// and second copy is invisible and the loop never visibly "resets."
+function PartnerMarquee() {
+  const track = [...PARTNERS, ...PARTNERS];
+  return (
+    <div className="ep-container" style={{ position: 'relative', zIndex: 1, paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
+      <p style={{ textAlign: 'center', fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', color: 'rgba(34,48,43,.5)', marginBottom: 'var(--space-4)' }}>
+        Built for the Nexus Louisiana × Ochsner Health Cancer Care Challenge
+      </p>
+      <div className="gl-marquee">
+        <div className="gl-marquee-track">
+          {track.map((p, i) => (
+            <div className="gl-marquee-card" key={`${p.name}-${i}`}>
+              <img src={p.logo} alt={p.name} />
+              <div>
+                <div className="gl-marquee-name">{p.name}</div>
+                <div className="gl-marquee-desc">{p.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Answers reflect the real, current state of the product — the two
+// questions that touch unshipped features (caregiver-to-patient linking,
+// the AI Assistant) say so plainly rather than implying they work today.
+const FAQS = [
+  {
+    q: 'Is Elpis free for patients and caregivers?',
+    a: 'Yes. Individual patient and caregiver accounts are free during early access — no trial clock, no card required. Pricing only ever applies to provider organizations.',
+  },
+  {
+    q: 'Can I invite multiple family members to view my timeline?',
+    a: "Not yet — right now each caregiver signs up with their own separate account. Linking a caregiver directly to a patient's timeline is on our roadmap, not live yet.",
+  },
+  {
+    q: 'How does the AI Assistant use my health data?',
+    a: "The AI Assistant is designed to answer questions grounded only in your own chart — the appointments, medications and symptoms you've logged — visible to you and your care team, nothing else. It's still in development and not yet live in the app.",
+  },
+];
+
+function FAQItem({ q, a, open, onToggle }) {
+  return (
+    <div className={`gl-faq-card${open ? ' open' : ''}`}>
+      <button type="button" className="gl-faq-q" onClick={onToggle} aria-expanded={open}>
+        <span>{q}</span>
+        <span className={`gl-faq-toggle${open ? ' open' : ''}`}>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+        </span>
+      </button>
+      {open && <p className="gl-faq-a">{a}</p>}
+    </div>
+  );
+}
+
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState(0);
+  return (
+    <div className="ep-container" style={{ maxWidth: 720, paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-6)' }}>
+      <div style={{ textAlign: 'center' }}>
+        <span className="gl-faq-eyebrow">FAQs</span>
+        <h2 className="gl-faq-title">Straight <em>answers</em></h2>
+        <p className="gl-faq-sub">What Elpis does today — and what's still on the way.</p>
+      </div>
+      <div className="gl-faq-list">
+        {FAQS.map((f, i) => (
+          <FAQItem key={f.q} q={f.q} a={f.a} open={openIndex === i} onToggle={() => setOpenIndex(openIndex === i ? -1 : i)} />
+        ))}
+        <div className="gl-faq-card gl-faq-contact">
+          <span>Couldn&apos;t find the answer you were looking for?</span>
+          <Link to="/contact" className="btn btn-primary">Contact us</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Real Louisiana cancer centers, shown as plain text-mark circles scattered
+// around the closing CTA card — not their trademarked logos (those come
+// later), and not implying a partnership, the same way the Hospital Finder
+// just states that a place exists.
+const CANCER_CENTERS = [
+  { name: 'Ochsner', cls: 'a1', logo: '/ochsner-logo.png' },
+  { name: 'Mary Bird\nPerkins', cls: 'a2', logo: '/mary-bird-perkins-logo.jpeg' },
+  { name: 'Tulane', cls: 'a3', logo: '/tulane-logo.png' },
+  { name: 'LSU', cls: 'a4', logo: '/lsu-logo.png' },
+  { name: 'Our Lady\nof the Lake', cls: 'a5', logo: '/our-lady-of-the-lake-logo.png' },
+  { name: 'Willis-\nKnighton', cls: 'a6' },
+  { name: 'Touro', cls: 'a7', logo: '/touro-logo.png' },
+  { name: 'Christus', cls: 'a8', logo: '/christus-logo.webp' },
+  { name: 'Feist-\nWeiller', cls: 'a9' },
+  { name: 'Baton\nRouge\nGeneral', cls: 'a10', logo: '/baton-rouge-general-logo.png' },
+];
+
+function ClosingCTASection() {
+  return (
+    <div className="ep-container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
+      <div className="gl-cta-card">
+        {CANCER_CENTERS.map((c) => (
+          <div key={c.name} className={`gl-cta-mark ${c.cls}${c.logo ? ' has-logo' : ''}`}>
+            {c.logo ? <img src={c.logo} alt={c.name} /> : c.name.split('\n').map((line, i) => <span key={i}>{line}</span>)}
+          </div>
+        ))}
+
+        <div className="gl-cta-content">
+          <h2 style={{ margin: 0 }}>Begin with a little more clarity today.</h2>
+          <p>Elpis helps you track appointments, medications, symptoms, and stay connected with your care team.</p>
+          <div className="ep-btnrow" style={{ justifyContent: 'center', marginTop: 'var(--space-4)' }}>
+            <Link className="btn btn-primary" to="/register">Create an account →</Link>
+            <Link className="btn btn-secondary" to="/contact">Talk to us</Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Landing() {
   return (
     <div className="gl-public">
@@ -278,31 +447,35 @@ export default function Landing() {
         </div>
       </div>
 
-      <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
-        <div className="gl-blob" style={{ width: 300, height: 300, top: 40, right: '-2%', background: 'radial-gradient(circle, rgba(140,180,210,.4), transparent 70%)', animation: 'gl-float2 16s ease-in-out infinite' }} />
-        <div className="gl-blob" style={{ width: 260, height: 260, bottom: -40, left: '10%', background: 'radial-gradient(circle, rgba(126,211,183,.4), transparent 70%)', animation: 'gl-float 14s ease-in-out infinite' }} />
-        <h6 style={{ position: 'relative', zIndex: 1, color: 'var(--color-accent-700)' }}>A guide through treatment</h6>
-        <h2 style={{ position: 'relative', zIndex: 1, marginTop: 'var(--space-2)', maxWidth: '22ch' }}>Everything care requires, nothing it doesn't.</h2>
-        <div style={{ marginTop: 'var(--space-8)' }}>
-          <StickyFeatureSteps />
+      <div className="gl-feat-white-band">
+        <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
+          <div className="gl-blob" style={{ width: 300, height: 300, top: 40, right: 0, background: 'radial-gradient(circle, rgba(140,180,210,.4), transparent 70%)', animation: 'gl-float2 16s ease-in-out infinite' }} />
+          <div className="gl-blob" style={{ width: 260, height: 260, bottom: -40, left: '10%', background: 'radial-gradient(circle, rgba(126,211,183,.4), transparent 70%)', animation: 'gl-float 14s ease-in-out infinite' }} />
+          <h6 style={{ position: 'relative', zIndex: 1, color: 'var(--color-accent-700)' }}>A guide through treatment</h6>
+          <h2 style={{ position: 'relative', zIndex: 1, marginTop: 'var(--space-2)', maxWidth: '22ch' }}>Everything care requires, nothing it doesn't.</h2>
+          <div style={{ marginTop: 'var(--space-8)' }}>
+            <StickyFeatureSteps />
+          </div>
         </div>
       </div>
 
-      <div className="gl-quote-panel" style={{ padding: 'var(--space-8) 0' }}>
-        <div className="ep-container" style={{ maxWidth: 760, textAlign: 'center' }}>
-          <div className="gl-quote-mark">&ldquo;</div>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 27, fontWeight: 600, lineHeight: 1.35, margin: '-24px 0 0', color: '#22302b' }}>For the first time since my diagnosis, I didn't feel like I was managing this alone.</p>
+      <ConnectedCareSection />
+
+      <div className="gl-marquee-band">
+        <PartnerMarquee />
+
+        <div className="ep-container" style={{ position: 'relative', zIndex: 1, maxWidth: 620, textAlign: 'center', paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+          <div className="gl-quote-avatar-plain" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.5" stroke="currentColor" strokeWidth="1.4" /><path d="M4.5 20c1-3.8 4.2-6 7.5-6s6.5 2.2 7.5 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
+          </div>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 600, lineHeight: 1.4, margin: 'var(--space-4) 0 0', color: '#22302b' }}>&ldquo;For the first time since my diagnosis, I didn't feel like I was managing this alone.&rdquo;</p>
           <p className="text-muted" style={{ marginTop: 'var(--space-3)', fontSize: 13 }}>— Elpis patient, in treatment since 2025</p>
         </div>
       </div>
 
-      <div className="ep-container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)', textAlign: 'center' }}>
-        <h2 style={{ maxWidth: '20ch', marginLeft: 'auto', marginRight: 'auto' }}>Begin with a little more clarity today.</h2>
-        <div className="ep-btnrow" style={{ justifyContent: 'center', marginTop: 'var(--space-4)' }}>
-          <Link className="btn btn-primary" to="/register">Create an account</Link>
-          <Link className="btn btn-secondary" to="/contact">Talk to us</Link>
-        </div>
-      </div>
+      <FAQSection />
+
+      <ClosingCTASection />
 
       <div className="hr ep-container" />
       <Footer />

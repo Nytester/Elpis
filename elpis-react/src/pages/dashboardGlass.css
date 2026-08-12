@@ -314,7 +314,7 @@
    in .gl-hero-scene alone left too much photo showing through up top. */
 .gl-hero-scrim {
   position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%);
-  width: 880px; max-width: 160%; height: 460px;
+  width: 880px; max-width: 100%; height: 460px;
   background: radial-gradient(ellipse at center, rgba(242,245,243,.92) 0%, rgba(242,245,243,.7) 45%, rgba(242,245,243,0) 75%);
   pointer-events: none; z-index: 0;
 }
@@ -473,6 +473,17 @@
   box-shadow: 0 0 0 3px rgba(29, 122, 95, .18);
 }
 .gl-quote-mark { font-family: 'DM Sans', sans-serif; font-size: 72px; font-weight: 700; color: rgba(29,122,95,.18); line-height: 1; }
+
+/* Quote avatar placeholder — no card, no border, just a small circle sitting
+   directly on the marquee band's white background above the centered text. */
+.gl-quote-avatar-plain {
+  width: 52px; height: 52px; border-radius: 50%;
+  margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(29, 122, 95, .08);
+  color: rgba(29, 122, 95, .5);
+}
+.gl-quote-avatar-plain svg { width: 22px; height: 22px; }
 .gl-quote-panel {
   background: rgba(255, 255, 255, .14);
   backdrop-filter: blur(26px) saturate(160%); -webkit-backdrop-filter: blur(26px) saturate(160%);
@@ -517,3 +528,216 @@
 }
 .gl-post-nav .gl-kicker { display: block; margin-bottom: 6px; }
 .gl-post-nav h4 { margin: 0; font-size: 19px; font-weight: 600; font-family: var(--font-heading); }
+
+/* White band the marquee sits on — a deliberate contrast against the mint
+   sections around it (like a logo-wall strip), but faded in/out at the top
+   and bottom edges rather than cut with a hard line, so it still reads as
+   part of the same page instead of a pasted-in block. */
+.gl-marquee-band {
+  position: relative;
+  background: linear-gradient(180deg, transparent 0%, #fff 18%, #fff 82%, transparent 100%);
+  padding: 48px 0;
+}
+
+/* Same fade-to-white treatment as the marquee band, wrapping the feature
+   steps section instead — no `overflow` here on purpose, since this
+   container holds .gl-steps-sticky and clipping overflow would silently
+   break its position:sticky (bit us once already, see StickyFeatureSteps). */
+.gl-feat-white-band {
+  position: relative;
+  background: linear-gradient(180deg, transparent 0%, #fff 10%, #fff 92%, transparent 100%);
+}
+
+/* Partner logo marquee — continuous horizontal loop, edges faded via a mask
+   gradient (not clipped), cards are the same glass-card language as
+   everywhere else on the page. */
+.gl-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+.gl-marquee-track {
+  display: flex; align-items: stretch; gap: var(--space-5);
+  width: max-content;
+  animation: gl-marquee-scroll 26s linear infinite;
+}
+.gl-marquee:hover .gl-marquee-track { animation-play-state: paused; }
+@keyframes gl-marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.gl-marquee-card {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .55);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, .8);
+  box-shadow: 0 6px 20px rgba(31, 38, 135, .06);
+}
+.gl-marquee-card img { height: 34px; width: auto; max-width: 120px; object-fit: contain; flex-shrink: 0; }
+.gl-marquee-name { font-family: var(--font-heading); font-weight: 600; font-size: 14px; color: #16211d; white-space: nowrap; }
+.gl-marquee-desc { font-size: 12px; color: rgba(34,48,43,.55); white-space: nowrap; margin-top: 1px; }
+@media (prefers-reduced-motion: reduce) {
+  .gl-marquee-track { animation: none; }
+}
+
+/* FAQ — pill eyebrow + individual rounded cards with real gaps between them
+   (not a flat hairline-divided list), each toggled by a +/× control. */
+.gl-faq-eyebrow {
+  display: inline-flex; align-items: center;
+  padding: 7px 18px; border-radius: 999px;
+  background: #fff; border: 1px solid rgba(34, 48, 43, .12);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: rgba(34,48,43,.7);
+}
+.gl-faq-title {
+  font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 40px;
+  margin: var(--space-4) 0 0; color: #16211d;
+}
+.gl-faq-title em { font-style: italic; color: #1d7a5f; }
+.gl-faq-sub { margin: var(--space-3) 0 0; font-size: 15px; color: rgba(34,48,43,.65); }
+
+.gl-faq-list { display: flex; flex-direction: column; gap: 12px; margin-top: var(--space-6); }
+.gl-faq-card {
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(34, 48, 43, .08);
+  box-shadow: 0 2px 10px rgba(20, 40, 34, .04);
+  transition: box-shadow .2s ease;
+}
+.gl-faq-card.open { box-shadow: 0 8px 24px rgba(20, 40, 34, .08); }
+.gl-faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 20px 24px;
+  background: none; border: none; cursor: pointer; text-align: left;
+  font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15.5px; color: #16211d;
+}
+.gl-faq-toggle {
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(29, 122, 95, .1); color: #1d7a5f;
+  transition: transform .25s ease, background .2s ease;
+}
+.gl-faq-toggle svg { width: 14px; height: 14px; }
+.gl-faq-toggle.open { transform: rotate(45deg); background: #1d7a5f; color: #fff; }
+.gl-faq-a { margin: -6px 0 0; padding: 0 24px 20px; font-size: 14.5px; line-height: 1.6; color: rgba(34, 48, 43, .68); max-width: 62ch; }
+
+.gl-faq-contact {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 24px;
+  font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; color: #16211d;
+}
+
+/* "Everyone in the loop" — the one section on this page that deliberately
+   steps outside the glass system: solid-white polaroid cards (opaque,
+   shadow-only edge, no blur/border) linked by curved connector lines. */
+/* A faint dot grid + soft central glow — separates this section from the
+   plain mint gradient above/below it without a hard divider line, and
+   echoes the "infinite canvas" motif this section's design was borrowed
+   from (Fuser's scattered-cards-on-a-grid reference). */
+.gl-connect-scene {
+  position: relative;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+  background-image: radial-gradient(rgba(22, 33, 29, .1) 1px, transparent 1px);
+  background-size: 26px 26px;
+  background-position: center;
+}
+.gl-connect-scene::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(760px 460px at 50% 60%, rgba(126, 211, 183, .3), transparent 70%);
+  pointer-events: none;
+}
+.gl-connect-head { text-align: center; position: relative; z-index: 2; max-width: 480px; margin: 0 auto var(--space-8); }
+.gl-connect-title {
+  font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; line-height: 1.15;
+  margin: 10px 0 0; color: #16211d; text-wrap: balance;
+}
+.gl-connect-title em { font-style: italic; color: #1d7a5f; }
+.gl-connect-head p { max-width: 46ch; margin: 14px auto 0; font-size: 15px; line-height: 1.6; color: rgba(34,48,43,.72); }
+
+.gl-connect-canvas { position: relative; max-width: 880px; margin: 0 auto; height: 380px; }
+.gl-connect-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 1; }
+.gl-connect-path { fill: none; stroke: #1d7a5f; stroke-width: 1.4; opacity: .45; stroke-dasharray: 4 5; }
+.gl-connect-node { fill: #1d7a5f; }
+.gl-connect-node-ring { fill: none; stroke: #1d7a5f; stroke-width: 1.2; opacity: .35; }
+
+.gl-connect-card {
+  position: absolute; width: 220px; padding: 20px 22px; border-radius: 18px;
+  background: #ffffff;
+  box-shadow: rgba(20, 40, 34, .12) 0px 10px 15px -3px, rgba(20, 40, 34, .1) 0px 4px 6px -4px;
+  z-index: 2;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.gl-connect-card:hover {
+  transform: translateY(-4px) rotate(0deg) !important;
+  box-shadow: rgba(20, 40, 34, .18) 0px 18px 30px -6px, rgba(20, 40, 34, .12) 0px 6px 10px -4px;
+}
+.gl-connect-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(29, 122, 95, .12); color: #1d7a5f;
+  margin-bottom: 12px;
+}
+.gl-connect-icon svg { width: 18px; height: 18px; }
+.gl-connect-card h4 { margin: 0; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; color: #16211d; }
+.gl-connect-card p { margin: 5px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(34,48,43,.72); }
+
+.gl-connect-card.card--patient { top: 0; left: 8%; transform: rotate(-3deg); }
+.gl-connect-card.card--caregiver { top: 210px; left: 38%; transform: rotate(2deg); }
+.gl-connect-card.card--team { top: 30px; right: 6%; transform: rotate(3deg); }
+
+@media (max-width: 720px) {
+  .gl-connect-canvas { height: 640px; }
+  .gl-connect-card { width: 78%; left: 11% !important; right: auto !important; transform: none !important; }
+  .gl-connect-card.card--patient { top: 0; }
+  .gl-connect-card.card--caregiver { top: 220px; }
+  .gl-connect-card.card--team { top: 440px; }
+}
+
+/* Closing CTA — a card ringed by real Louisiana cancer center names as plain
+   text-mark circles (logos to come later; see CANCER_CENTERS in Landing.jsx). */
+.gl-cta-card {
+  position: relative;
+  padding: 88px 40px;
+  border-radius: 28px;
+  background: #f4f7f5;
+  border: 1px solid rgba(20, 40, 34, .06);
+  box-shadow: 0 30px 60px -30px rgba(20, 40, 34, .18);
+  overflow: hidden;
+}
+.gl-cta-mark {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgba(29, 122, 95, .22);
+  box-shadow: 0 8px 20px -8px rgba(20,40,34,.25);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  color: #1d7a5f;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -.01em; line-height: 1.15;
+  padding: 4px;
+}
+.gl-cta-mark.has-logo { padding: 14px; }
+.gl-cta-mark.has-logo img { width: 100%; height: 100%; object-fit: contain; }
+.gl-cta-mark.a1 { width: 78px; height: 78px; top: 14%; left: 6%; font-size: 12px; }
+.gl-cta-mark.a2 { width: 100px; height: 100px; top: -6%; left: 20%; font-size: 14px; }
+.gl-cta-mark.a3 { width: 66px; height: 66px; top: 44%; left: 10%; font-size: 11px; }
+.gl-cta-mark.a4 { width: 60px; height: 60px; bottom: 6%; left: 4%; font-size: 11px; }
+.gl-cta-mark.a5 { width: 90px; height: 90px; bottom: -8%; left: 24%; font-size: 13px; }
+.gl-cta-mark.a6 { width: 86px; height: 86px; top: 8%; right: 8%; font-size: 13px; }
+.gl-cta-mark.a7 { width: 62px; height: 62px; top: 30%; right: -2%; font-size: 11px; }
+.gl-cta-mark.a8 { width: 72px; height: 72px; top: 56%; right: 12%; font-size: 12px; }
+.gl-cta-mark.a9 { width: 60px; height: 60px; bottom: 10%; right: 22%; font-size: 11px; }
+.gl-cta-mark.a10 { width: 94px; height: 94px; bottom: -10%; right: 4%; font-size: 13px; }
+
+.gl-cta-content { position: relative; z-index: 2; text-align: center; max-width: 460px; margin: 0 auto; }
+.gl-cta-content p { margin: var(--space-3) 0 0; font-size: 15px; line-height: 1.6; color: rgba(34,48,43,.7); }
+
+@media (max-width: 720px) {
+  .gl-cta-mark { display: none; }
+  .gl-cta-card { padding: 56px 28px; }
+}

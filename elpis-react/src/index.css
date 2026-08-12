@@ -190,13 +190,45 @@ textarea.input { min-height: 90px; resize: vertical; }
   display: flex; align-items: center; gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-divider);
+  position: relative;
 }
 .nav-brand {
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
   font-size: 18px; margin-right: auto;
 }
-.nav a { color: inherit; text-decoration: none; font-size: 14px; }
+.nav-links { display: flex; align-items: center; gap: var(--space-4); }
+.nav a { color: inherit; text-decoration: none; font-size: 14px; white-space: nowrap; }
 .nav a:hover, .nav a[aria-current='page'] { color: var(--color-accent); }
+.nav-actions { display: flex; gap: var(--space-2); margin-left: var(--space-4); flex-shrink: 0; }
+
+.nav-burger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center; gap: 4px;
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: transparent; border: 1px solid var(--color-divider); border-radius: var(--radius-md, 8px);
+  cursor: pointer; padding: 0;
+}
+.nav-burger span { width: 16px; height: 1.5px; background: var(--color-text); border-radius: 2px; }
+
+/* Below this width the link row no longer fits — collapse it into a
+   burger-triggered dropdown instead of letting it force horizontal
+   overflow on the whole page. */
+@media (max-width: 900px) {
+  .nav-burger { display: flex; }
+  .nav-links {
+    display: none;
+    position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--color-bg); border-bottom: 1px solid var(--color-divider);
+    padding: var(--space-2) var(--space-4) var(--space-4);
+    box-shadow: 0 12px 24px -12px rgba(0,0,0,.15);
+    z-index: 50;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: var(--space-3) 0; border-bottom: 1px solid var(--color-divider); }
+  .nav-actions { flex-direction: column; margin-left: 0; margin-top: var(--space-3); }
+  .nav-actions .btn { width: 100%; text-align: center; }
+}
 
 /* Page-level utilities */
 .ep-container { max-width: 1180px; margin: 0 auto; padding-left: var(--space-6); padding-right: var(--space-6); }
