@@ -4,6 +4,7 @@ import ProviderSidebar from '../components/ProviderSidebar.jsx';
 import { useProviderRoster } from '../hooks/useProviderRoster.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { supabase } from '../lib/supabaseClient.js';
+import './dashboardGlass.css';
 
 const PHASE_TAG = { Treatment: 'tag-accent-2', Surveillance: 'tag-neutral', Survivorship: 'tag-outline' };
 const PHASES = ['Treatment', 'Surveillance', 'Survivorship'];
@@ -114,10 +115,11 @@ export default function ProviderDashboard() {
   const flagged = patients.filter((p) => p.alert);
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <ProviderSidebar active="Patient Roster" />
 
       <div className="ep-main">
+      <div className="gl-dash">
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 'var(--space-6)' }}>
           <div>
             <h1 style={{ fontSize: 30, fontWeight: 400 }}>Patient Roster</h1>
@@ -167,6 +169,7 @@ export default function ProviderDashboard() {
             </div>
           </>
         )}
+      </div>
       </div>
     </div>
   );

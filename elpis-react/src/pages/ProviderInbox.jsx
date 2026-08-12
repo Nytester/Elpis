@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import ProviderSidebar from '../components/ProviderSidebar.jsx';
 import { useProviderInbox } from '../hooks/useProviderInbox.js';
+import './dashboardGlass.css';
 
 export default function ProviderInbox() {
   const { items, loading, markHandled } = useProviderInbox();
@@ -9,10 +10,11 @@ export default function ProviderInbox() {
   const handled = items.filter((i) => i.handled);
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <ProviderSidebar active="Inbox" />
 
       <div className="ep-main">
+      <div className="gl-dash">
         <div style={{ marginBottom: 'var(--space-6)' }}>
           <h1 style={{ fontSize: 30, fontWeight: 400 }}>Inbox</h1>
           <p className="text-muted" style={{ fontSize: 13, marginTop: 2 }}>Medication refill requests across your roster.</p>
@@ -59,6 +61,7 @@ export default function ProviderInbox() {
             )}
           </>
         )}
+      </div>
       </div>
     </div>
   );

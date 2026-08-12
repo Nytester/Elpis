@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ProviderSidebar from '../components/ProviderSidebar.jsx';
+import './dashboardGlass.css';
 import { useProviderPatient } from '../hooks/useProviderPatient.js';
 import { getSteps } from '../lib/authorizationSteps.js';
 
@@ -101,30 +102,33 @@ export default function ProviderPatientDetail() {
 
   if (loading) {
     return (
-      <div className="ep-shell-dash">
+      <div className="ep-shell-dash gl-shell">
         <ProviderSidebar active="Patient Roster" />
-        <div className="ep-main"><p className="text-muted">Loading…</p></div>
+        <div className="ep-main"><div className="gl-dash"><p className="text-muted">Loading…</p></div></div>
       </div>
     );
   }
 
   if (!patient) {
     return (
-      <div className="ep-shell-dash">
+      <div className="ep-shell-dash gl-shell">
         <ProviderSidebar active="Patient Roster" />
         <div className="ep-main">
-          <p>Patient not found.</p>
-          <Link className="btn btn-secondary" to="/provider">Back to roster</Link>
+          <div className="gl-dash">
+            <p>Patient not found.</p>
+            <Link className="btn btn-secondary" to="/provider">Back to roster</Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="ep-shell-dash">
+    <div className="ep-shell-dash gl-shell">
       <ProviderSidebar active="Patient Roster" />
 
       <div className="ep-main">
+      <div className="gl-dash">
         <Link to="/provider" style={{ fontSize: 13, color: 'var(--color-neutral-600)' }}>← Back to roster</Link>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
@@ -365,6 +369,7 @@ export default function ProviderPatientDetail() {
             </p>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
