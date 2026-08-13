@@ -32,6 +32,8 @@ import Insurance from './pages/Insurance.jsx';
 import ProviderDashboard from './pages/ProviderDashboard.jsx';
 import ProviderPatientDetail from './pages/ProviderPatientDetail.jsx';
 import ProviderInbox from './pages/ProviderInbox.jsx';
+import ProviderCareTasks from './pages/ProviderCareTasks.jsx';
+import ProviderAppointments from './pages/ProviderAppointments.jsx';
 import ProviderSettings from './pages/ProviderSettings.jsx';
 
 const PATIENT_ROLES = ['patient', 'caregiver'];
@@ -73,6 +75,8 @@ export default function App() {
           <Route path="/provider" element={<RequireRole roles={['provider']}><ProviderDashboard /></RequireRole>} />
           <Route path="/provider/patients/:id" element={<RequireRole roles={['provider']}><ProviderPatientDetail /></RequireRole>} />
           <Route path="/provider/inbox" element={<RequireRole roles={['provider']}><ProviderInbox /></RequireRole>} />
+          <Route path="/provider/tasks" element={<RequireRole roles={['provider']}><ProviderCareTasks /></RequireRole>} />
+          <Route path="/provider/appointments" element={<RequireRole roles={['provider']}><ProviderAppointments /></RequireRole>} />
           <Route path="/provider/settings" element={<RequireRole roles={['provider']}><ProviderSettings /></RequireRole>} />
         </Routes>
       </PatientDataProvider>

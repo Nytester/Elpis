@@ -112,7 +112,18 @@ function InvitePatientForm({ onDone }) {
 export default function ProviderDashboard() {
   const { patients, loading } = useProviderRoster();
   const [showInvite, setShowInvite] = useState(false);
+  const [search, setSearch] = useState('');
+  const [phaseFilter, setPhaseFilter] = useState('All');
+  const [alertsOnly, setAlertsOnly] = useState(false);
   const flagged = patients.filter((p) => p.alert);
+
+  const filtered = patients.filter((p) => {
+    if (search.trim() && !p.full_name?.toLowerCase().includes(search.trim().toLowerCase())) return false;
+    if (phaseFilter !== 'All' && p.phase !== phaseFilter) return false;
+    if (alertsOnly && !p.alert) return false;
+    return true;
+  });
+  const filtersActive = search.trim() !== '' || phaseFilter !== 'All' || alertsOnly;
 
   return (
     <div className="ep-shell-dash gl-shell">
@@ -150,9 +161,42 @@ export default function ProviderDashboard() {
 
         {!loading && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 'var(--space-3)' }}>All patients</h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 600 }}>
+                All patients {filtersActive ? `(${filtered.length} of ${patients.length})` : `(${patients.length})`}
+              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                <input
+                  className="input"
+                  placeholder="Search by name…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{ width: 200 }}
+                />
+                <select className="input" value={phaseFilter} onChange={(e) => setPhaseFilter(e.target.value)} style={{ width: 160 }}>
+                  <option value="All">All phases</option>
+                  {PHASES.map((ph) => <option key={ph} value={ph}>{ph}</option>)}
+                </select>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <input type="checkbox" checked={alertsOnly} onChange={(e) => setAlertsOnly(e.target.checked)} />
+                  Alerts only
+                </label>
+                {filtersActive && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => { setSearch(''); setPhaseFilter('All'); setAlertsOnly(false); }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
             <div className="card elev-sm" style={{ padding: 'var(--space-2) var(--space-3)' }}>
-              {patients.map((p) => (
+              {filtered.length === 0 && (
+                <p className="text-muted" style={{ fontSize: 13, padding: 'var(--space-3) 0' }}>No patients match these filters.</p>
+              )}
+              {filtered.map((p) => (
                 <div key={p.id} className="ep-doc-row">
                   <div className="ep-avatar">{p.full_name?.split(' ').map((w) => w[0]).join('')}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
