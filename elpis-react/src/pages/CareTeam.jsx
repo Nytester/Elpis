@@ -4,13 +4,13 @@ import Sidebar from '../components/Sidebar.jsx';
 import { usePatientData } from '../context/PatientDataContext.jsx';
 import './dashboardGlass.css';
 
-const CONTACT_COLORS = { osei: '#1d7a5f', tran: '#7a4fb8', chen: '#b5732a' };
+const CONTACT_COLORS = { provider: '#1d7a5f', tran: '#7a4fb8', chen: '#b5732a' };
 
-const CONTACTS = [
-  {
-    id: 'osei', initials: 'RO', name: 'Dr. Rina Osei', role: 'Oncologist',
-    messages: [],
-  },
+function initialsOf(name) {
+  return name?.split(' ').filter(Boolean).map((w) => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+}
+
+const OTHER_CONTACTS = [
   {
     id: 'tran', initials: 'JT', name: 'Jordan Tran, RN', role: 'Nurse Navigator',
     messages: [
@@ -30,22 +30,37 @@ const CONTACTS = [
 ];
 
 export default function CareTeam() {
-  const { messages: oseiMessages, sendMessage: sendOseiMessage } = usePatientData();
+  const { messages: providerMessages, sendMessage: sendProviderMessage, providerName } = usePatientData();
+
+  // The one real, backend-wired thread — labeled with the patient's actual
+  // assigned provider (fetched from their real profile), never a fabricated
+  // name. If no provider is assigned yet, this says so honestly instead of
+  // guessing.
+  const providerContact = {
+    id: 'provider',
+    initials: providerName ? initialsOf(providerName) : '—',
+    name: providerName || 'No provider assigned yet',
+    role: providerName ? 'Your care provider' : 'Ask your care team to link one',
+    messages: [],
+  };
+  const CONTACTS = [providerContact, ...OTHER_CONTACTS];
+
   const [searchParams] = useSearchParams();
   const requestedId = searchParams.get('contact');
   const initialId = CONTACTS.some((c) => c.id === requestedId) ? requestedId : CONTACTS[0].id;
 
   const [threads, setThreads] = useState(() =>
-    Object.fromEntries(CONTACTS.filter((c) => c.id !== 'osei').map((c) => [c.id, c.messages]))
+    Object.fromEntries(OTHER_CONTACTS.map((c) => [c.id, c.messages]))
   );
   const [activeId, setActiveId] = useState(initialId);
   const [draft, setDraft] = useState('');
   const scrollRef = useRef(null);
 
-  const activeMessages = activeId === 'osei' ? oseiMessages : threads[activeId];
+  const activeMessages = activeId === 'provider' ? providerMessages : threads[activeId];
 
   useEffect(() => {
     if (CONTACTS.some((c) => c.id === requestedId)) setActiveId(requestedId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedId]);
 
   useEffect(() => {
@@ -58,8 +73,8 @@ export default function CareTeam() {
     const text = draft.trim();
     if (!text) return;
 
-    if (activeId === 'osei') {
-      sendOseiMessage(text);
+    if (activeId === 'provider') {
+      sendProviderMessage(text);
     } else {
       const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       setThreads((t) => ({

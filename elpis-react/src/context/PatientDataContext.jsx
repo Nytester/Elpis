@@ -32,6 +32,7 @@ export function PatientDataProvider({ children }) {
   const [authorizations, setAuthorizations] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [homeZip, setHomeZipState] = useState(null);
+  const [providerName, setProviderName] = useState(null);
 
   // Resolve the logged-in user's own patients.id row (and home_zip, in the
   // same query — it lives on the same row)
@@ -43,15 +44,22 @@ export function PatientDataProvider({ children }) {
       setAuthorizations([]);
       setAppointments([]);
       setHomeZipState(null);
+      setProviderName(null);
       return;
     }
     // maybeSingle, not single — a caregiver account legitimately has zero
     // rows here (there's no caregiver-to-patient linking system yet), and
     // that should resolve to patientId: null quietly, not a 406 error.
-    supabase.from('patients').select('id, home_zip').eq('profile_id', session.user.id).maybeSingle()
+    supabase.from('patients').select('id, home_zip, provider_id').eq('profile_id', session.user.id).maybeSingle()
       .then(({ data }) => {
         setPatientId(data?.id ?? null);
         setHomeZipState(data?.home_zip ?? null);
+        if (data?.provider_id) {
+          supabase.from('profiles').select('full_name').eq('id', data.provider_id).maybeSingle()
+            .then(({ data: providerRow }) => setProviderName(providerRow?.full_name ?? null));
+        } else {
+          setProviderName(null);
+        }
       });
   }, [session]);
 
@@ -183,7 +191,7 @@ export function PatientDataProvider({ children }) {
   }, []);
 
   return (
-    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations, appointments, homeZip, setHomeZip }}>
+    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations, appointments, homeZip, setHomeZip, providerName }}>
       {children}
     </PatientDataContext.Provider>
   );

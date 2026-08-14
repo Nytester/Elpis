@@ -58,7 +58,10 @@ function monthGrid(date) {
 
 export default function Dashboard() {
   const [meds, setMeds] = useState(INITIAL_MEDS);
-  const { symptoms, authorizations, appointments, homeZip } = usePatientData();
+  const { symptoms, authorizations, appointments, homeZip, providerName } = usePatientData();
+  const providerInitials = providerName
+    ? providerName.split(' ').filter(Boolean).map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+    : '—';
   const { profile } = useAuth();
   const firstName = profile?.full_name?.split(' ')[0] ?? '';
   const now = useClock();
@@ -155,10 +158,10 @@ export default function Dashboard() {
                     <div style={{ fontSize: 26, fontWeight: 300, fontVariantNumeric: 'tabular-nums' }}>{timeLabel}</div>
                   </div>
                   <div className="gl-panel" style={{ padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 9, flex: 1 }}>
-                    <div className="gl-avatar gl-avatar-lg" style={{ width: 60, height: 60, fontSize: 18, background: '#1d7a5f' }}>RO</div>
+                    <div className="gl-avatar gl-avatar-lg" style={{ width: 60, height: 60, fontSize: 18, background: '#1d7a5f' }}>{providerInitials}</div>
                     <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 600 }}>Dr. Rina Osei</div>
-                      <div style={{ fontSize: 11, color: 'rgba(34,48,43,.55)' }}>Oncologist</div>
+                      <div style={{ fontSize: 13.5, fontWeight: 600 }}>{providerName || 'No provider assigned yet'}</div>
+                      <div style={{ fontSize: 11, color: 'rgba(34,48,43,.55)' }}>{providerName ? 'Your care provider' : 'Ask your care team to link one'}</div>
                     </div>
                     <Link className="gl-pill" style={{ width: '100%', marginTop: 'auto' }} to="/dashboard/care-team">Message</Link>
                   </div>
@@ -271,7 +274,7 @@ export default function Dashboard() {
                 <div style={{ fontSize: 15, fontWeight: 600, marginTop: 4 }}>Reach your team</div>
                 <div style={{ display: 'flex', flexDirection: 'column', marginTop: 8 }}>
                   {[
-                    { id: 'osei', initials: 'RO', name: 'Dr. Rina Osei', role: 'Oncologist', color: '#1d7a5f' },
+                    { id: 'provider', initials: providerInitials, name: providerName || 'No provider assigned yet', role: providerName ? 'Your care provider' : 'Ask your care team to link one', color: '#1d7a5f' },
                     { id: 'tran', initials: 'JT', name: 'Jordan Tran, RN', role: 'Nurse Navigator', color: '#7a4fb8' },
                     { id: 'chen', initials: 'SC', name: 'Sam Chen', role: 'Caregiver', color: '#b5732a' },
                   ].map(({ id, initials, name, role, color }) => (
