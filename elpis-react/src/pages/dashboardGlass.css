@@ -395,6 +395,24 @@
 .gl-bento > * { position: relative; z-index: 1; }
 .gl-bento:hover { transform: translateY(-4px); background: rgba(255,255,255,.28); box-shadow: 0 20px 40px -20px rgba(20,60,52,.35), inset 0 1px 0 rgba(255,255,255,.6); }
 
+/* Legal page side-nav (Privacy Policy, Terms of Service) — a sticky column
+   of section jump-links next to the gl-bento cards. */
+.gl-legal-nav {
+  position: sticky; top: 90px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.gl-legal-navlink {
+  font-size: 13px; color: rgba(34,48,43,.55); text-decoration: none;
+  padding: 7px 10px; border-radius: 10px; border-left: 2px solid transparent;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.gl-legal-navlink:hover { background: rgba(255,255,255,.5); color: #22302b; }
+.gl-legal-navlink.active { color: #1d7a5f; font-weight: 600; border-left-color: #1d7a5f; background: rgba(255,255,255,.6); }
+@media (max-width: 760px) {
+  .gl-legal-grid { grid-template-columns: 1fr !important; }
+  .gl-legal-nav { position: static; flex-direction: row; flex-wrap: wrap; }
+}
+
 /* Sticky-scroll feature sequence — left column lists all 7 steps (dimmed
    until active), right column stays pinned and its card morphs to match.
    Whichever step sits at the vertical center of the viewport is "active";

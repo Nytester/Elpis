@@ -10,13 +10,18 @@ import './dashboardGlass.css';
 // property overrides in dashboardGlass.css, without touching the shared
 // component or affecting the public page (which never gets that wrapper).
 export default function Transportation() {
-  const { homeZip } = usePatientData();
+  const { homeZip, appointments, linkAppointmentHospital } = usePatientData();
   return (
     <div className="ep-shell-dash gl-shell">
       <Sidebar active="Transportation" />
       <div className="ep-main">
         <div className="gl-dash">
-          <HospitalFinderPanel title="Transportation" defaultZip={homeZip ?? ''} />
+          <HospitalFinderPanel
+            title="Transportation"
+            defaultZip={homeZip ?? ''}
+            appointments={appointments}
+            onLinkHospital={linkAppointmentHospital}
+          />
         </div>
       </div>
     </div>

@@ -190,8 +190,16 @@ export function PatientDataProvider({ children }) {
     return { error };
   }, []);
 
+  const linkAppointmentHospital = useCallback(async (appointmentId, hospitalId) => {
+    const { error } = await supabase.rpc('link_appointment_hospital', { appointment_id: appointmentId, new_hospital_id: hospitalId });
+    if (!error) {
+      setAppointments((prev) => prev.map((a) => (a.id === appointmentId ? { ...a, hospital_id: hospitalId } : a)));
+    }
+    return { error };
+  }, []);
+
   return (
-    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations, appointments, homeZip, setHomeZip, providerName }}>
+    <PatientDataContext.Provider value={{ patientId, symptoms, logSymptom, requestRefill, messages, sendMessage, authorizations, appointments, homeZip, setHomeZip, providerName, linkAppointmentHospital }}>
       {children}
     </PatientDataContext.Provider>
   );

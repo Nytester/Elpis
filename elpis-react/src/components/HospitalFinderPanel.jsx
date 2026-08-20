@@ -1,18 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { geocodeZip, milesBetween, bearingDegrees } from '../lib/geocode.js';
-import { HOSPITALS } from '../lib/hospitals.js';
+import { HOSPITALS, hospitalId, directionsUrl } from '../lib/hospitals.js';
 import { TRANSPORT_RESOURCES } from '../lib/transportResources.js';
 
 const RADIUS_MIN = 5;
 const RADIUS_MAX = 100;
 
-function directionsUrl(hospital) {
-  const query = `${hospital.address}, ${hospital.city}, ${hospital.state} ${hospital.zip}`;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-}
-
-function hospitalId(h) {
-  return h.zip + h.name;
+function apptDateLabel(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 // Subtle CSS-only "3D" tilt: rotates a couple degrees toward the cursor and
@@ -57,10 +52,12 @@ function TiltCard({ children, style, highlighted, onMouseEnter, onMouseLeave }) 
 // A row in the continuous hospital list — flat/divided at rest (no gap, no
 // shadow, no radius), lifting into a tilted card only on hover, matching the
 // reference's list behavior exactly.
-function HospitalRow({ h, index, isLast, highlighted, onMouseEnter, onMouseLeave }) {
+function HospitalRow({ h, index, isLast, highlighted, onMouseEnter, onMouseLeave, linkableAppointments, linkedAppointment, onLinkHospital }) {
   const ref = useRef(null);
   const [transform, setTransform] = useState('perspective(800px) rotateX(0deg) rotateY(0deg)');
   const [hovering, setHovering] = useState(false);
+  const [selectedApptId, setSelectedApptId] = useState(linkableAppointments?.[0]?.id ?? '');
+  const [linking, setLinking] = useState(false);
   const active = hovering || highlighted;
 
   const handleMouseMove = (e) => {
@@ -102,7 +99,7 @@ function HospitalRow({ h, index, isLast, highlighted, onMouseEnter, onMouseLeave
         </div>
       </div>
       <p className="card-body" style={{ marginTop: 4 }}>{h.address}, {h.city}, {h.state} {h.zip}</p>
-      <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center', marginTop: 'var(--space-2)' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
         {h.phone && <span className="text-muted" style={{ fontSize: 12 }}>{h.phone}</span>}
         <div style={{ flex: 1 }} />
         <a
@@ -116,6 +113,47 @@ function HospitalRow({ h, index, isLast, highlighted, onMouseEnter, onMouseLeave
           Directions
         </a>
       </div>
+
+      {linkedAppointment && (
+        <div className="tag tag-outline" style={{ marginTop: 'var(--space-2)', fontSize: 12 }}>
+          ✓ Linked to your {apptDateLabel(linkedAppointment.scheduled_at)} appointment
+        </div>
+      )}
+
+      {!linkedAppointment && linkableAppointments?.length > 0 && (
+        <div
+          style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {linkableAppointments.length > 1 && (
+            <select
+              className="input"
+              style={{ fontSize: 12, padding: '4px 8px', width: 'auto' }}
+              value={selectedApptId}
+              onChange={(e) => setSelectedApptId(e.target.value)}
+            >
+              {linkableAppointments.map((a) => (
+                <option key={a.id} value={a.id}>{a.type} · {apptDateLabel(a.scheduled_at)}</option>
+              ))}
+            </select>
+          )}
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{ fontSize: 12, padding: '5px 12px' }}
+            disabled={linking}
+            onClick={async () => {
+              setLinking(true);
+              await onLinkHospital(selectedApptId || linkableAppointments[0].id, hospitalId(h));
+              setLinking(false);
+            }}
+          >
+            {linking ? 'Linking…' : linkableAppointments.length > 1
+              ? 'Use for selected appointment'
+              : `Use for my ${apptDateLabel(linkableAppointments[0].scheduled_at)} appointment`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -202,7 +240,7 @@ function GlobeMap({ patientCoords, hospitals, radius, hoveredId, onHover, zip })
 // (Transportation.jsx, wrapped in Sidebar) and on the public, no-login
 // Hospital Finder page (pages/HospitalFinder.jsx, wrapped in Navbar/Footer).
 // One implementation, two shells, so a fix here applies everywhere.
-export default function HospitalFinderPanel({ title = 'Hospital Finder', defaultZip = '' }) {
+export default function HospitalFinderPanel({ title = 'Hospital Finder', defaultZip = '', appointments, onLinkHospital }) {
   const [zip, setZip] = useState(defaultZip);
   const [radius, setRadius] = useState(75);
   const [allNearby, setAllNearby] = useState(null); // unfiltered, sorted by distance
@@ -225,6 +263,22 @@ export default function HospitalFinderPanel({ title = 'Hospital Finder', default
   // Radius is applied client-side against the already-geocoded list, so
   // dragging the slider updates results live without a new search.
   const results = allNearby ? allNearby.filter((h) => h.distance <= radius) : null;
+
+  // appointments/onLinkHospital are only passed by the patient dashboard
+  // (Transportation.jsx) — undefined on the public /hospital-finder page,
+  // where there's no logged-in patient to link an appointment to.
+  const now = new Date();
+  const upcomingUnlinked = appointments
+    ? appointments.filter((a) => a.status === 'scheduled' && new Date(a.scheduled_at) >= now && !a.hospital_id)
+    : [];
+  const linkedByHospitalId = {};
+  if (appointments) {
+    for (const a of appointments) {
+      if (a.hospital_id && a.status === 'scheduled' && new Date(a.scheduled_at) >= now) {
+        linkedByHospitalId[a.hospital_id] = a;
+      }
+    }
+  }
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -354,6 +408,9 @@ export default function HospitalFinderPanel({ title = 'Hospital Finder', default
                       highlighted={hoveredId === id}
                       onMouseEnter={() => setHoveredId(id)}
                       onMouseLeave={() => setHoveredId(null)}
+                      linkableAppointments={upcomingUnlinked}
+                      linkedAppointment={linkedByHospitalId[id]}
+                      onLinkHospital={onLinkHospital}
                     />
                   );
                 })}

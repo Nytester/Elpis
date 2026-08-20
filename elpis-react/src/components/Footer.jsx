@@ -23,6 +23,11 @@ export default function Footer() {
         <Link className="ep-footlink" to="/login">Log in</Link>
         <Link className="ep-footlink" to="/register">Register</Link>
       </div>
+      <div>
+        <h6 style={{ marginBottom: 'var(--space-3)' }}>Legal</h6>
+        <Link className="ep-footlink" to="/privacy">Privacy Policy</Link>
+        <Link className="ep-footlink" to="/terms">Terms of Service</Link>
+      </div>
     </div>
   );
 }

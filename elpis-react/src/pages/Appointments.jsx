@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Sidebar from '../components/Sidebar.jsx';
 import { usePatientData } from '../context/PatientDataContext.jsx';
 import { useCareTasks } from '../hooks/useCareTasks.js';
+import { findHospitalById, directionsUrl } from '../lib/hospitals.js';
 import './dashboardGlass.css';
 
 const STATUS_TAG = {
@@ -37,6 +38,7 @@ function RescheduleButton({ patientId, appointment }) {
 function AppointmentCard({ patientId, appointment }) {
   const { date, time } = formatWhen(appointment.scheduled_at);
   const status = STATUS_TAG[appointment.status] ?? STATUS_TAG.scheduled;
+  const linkedHospital = appointment.hospital_id ? findHospitalById(appointment.hospital_id) : null;
   return (
     <div className="gl-panel" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
@@ -48,6 +50,12 @@ function AppointmentCard({ patientId, appointment }) {
       </div>
       {appointment.location && <div style={{ fontSize: 13, color: 'rgba(34,48,43,.6)' }}>{appointment.location}</div>}
       {appointment.provider_note && <p style={{ fontSize: 13, color: 'rgba(34,48,43,.7)', margin: 0 }}>{appointment.provider_note}</p>}
+      {linkedHospital && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, background: 'rgba(29,122,95,.08)', borderRadius: 10, padding: '8px 12px' }}>
+          <span style={{ flex: 1, color: '#1d7a5f' }}>📍 {linkedHospital.name}</span>
+          <a href={directionsUrl(linkedHospital)} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: '#1d7a5f', fontWeight: 600 }}>Get directions →</a>
+        </div>
+      )}
       {appointment.status === 'scheduled' && (
         <div style={{ marginTop: 4 }}>
           <RescheduleButton patientId={patientId} appointment={appointment} />

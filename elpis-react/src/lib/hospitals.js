@@ -113,3 +113,20 @@ const NCI_DESIGNATED_CENTERS = [
 ];
 
 export const HOSPITALS = [...OCHSNER, ...LOUISIANA_CANCER_CENTERS, ...NCI_DESIGNATED_CENTERS];
+
+// Stable-enough id for a static, curated list like this one (no real primary
+// key since these aren't rows in a database) — zip+name is unique across
+// every entry above. Used both by HospitalFinderPanel (map/list keys) and to
+// persist which hospital a patient linked to an appointment.
+export function hospitalId(h) {
+  return h.zip + h.name;
+}
+
+export function findHospitalById(id) {
+  return HOSPITALS.find((h) => hospitalId(h) === id);
+}
+
+export function directionsUrl(hospital) {
+  const query = `${hospital.address}, ${hospital.city}, ${hospital.state} ${hospital.zip}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
