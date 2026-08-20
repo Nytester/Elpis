@@ -4,6 +4,43 @@ import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import '../pages/dashboardGlass.css';
 
+// Wraps a section in a fade/slide-up that plays once, the moment it scrolls
+// into view — a single shared IntersectionObserver per instance rather than
+// a scroll listener, and it disconnects itself after triggering once so it
+// never re-runs on scroll-back. `delay` (ms) lets sibling sections stagger.
+function Reveal({ children, as: Tag = 'div', className = '', style, delay = 0, ...rest }) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') { setInView(true); return; }
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <Tag
+      ref={ref}
+      className={`gl-reveal${inView ? ' gl-reveal-in' : ''}${className ? ` ${className}` : ''}`}
+      style={delay ? { ...style, transitionDelay: `${delay}ms` } : style}
+      {...rest}
+    >
+      {children}
+    </Tag>
+  );
+}
+
 // Simple monochrome line-icon set (24x24, stroke-only) — one glyph per
 // feature row, no icon library, so it stays consistent with the rest of the
 // hand-drawn inline SVGs already used across the app.
@@ -47,11 +84,11 @@ const CONNECTED = [
 function ConnectedCareSection() {
   return (
     <div className="ep-container gl-connect-scene">
-      <div className="gl-connect-head">
+      <Reveal className="gl-connect-head">
         <span className="gl-kicker">Always connected</span>
         <h2 className="gl-connect-title">Care doesn&apos;t happen<br /><em>in one place —</em><br />neither should the record of it.</h2>
         <p>Patients, caregivers and care teams each see the same picture, updated as it happens.</p>
-      </div>
+      </Reveal>
 
       <div className="gl-connect-canvas">
         <svg className="gl-connect-lines" viewBox="0 0 880 380" role="img" aria-label="Three connected cards: Patient, Caregiver, and Care Team, linked by curved lines meeting at a shared center point">
@@ -62,12 +99,12 @@ function ConnectedCareSection() {
           <circle className="gl-connect-node-ring" cx="440" cy="190" r="11" />
         </svg>
 
-        {CONNECTED.map((c) => (
-          <div key={c.name} className={`gl-connect-card ${c.cls}`}>
+        {CONNECTED.map((c, i) => (
+          <Reveal key={c.name} as="div" className={`gl-connect-card ${c.cls}`} delay={i * 120}>
             <div className="gl-connect-icon">{ICONS[c.icon]}</div>
             <h4>{c.name}</h4>
             <p>{c.desc}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </div>
@@ -362,12 +399,12 @@ function FAQSection() {
   const [openIndex, setOpenIndex] = useState(0);
   return (
     <div className="ep-container" style={{ maxWidth: 720, paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-6)' }}>
-      <div style={{ textAlign: 'center' }}>
+      <Reveal style={{ textAlign: 'center' }}>
         <span className="gl-faq-eyebrow">FAQs</span>
         <h2 className="gl-faq-title">Straight <em>answers</em></h2>
         <p className="gl-faq-sub">What Elpis does today — and what's still on the way.</p>
-      </div>
-      <div className="gl-faq-list">
+      </Reveal>
+      <Reveal as="div" className="gl-faq-list" delay={100}>
         {FAQS.map((f, i) => (
           <FAQItem key={f.q} q={f.q} a={f.a} open={openIndex === i} onToggle={() => setOpenIndex(openIndex === i ? -1 : i)} />
         ))}
@@ -375,7 +412,7 @@ function FAQSection() {
           <span>Couldn&apos;t find the answer you were looking for?</span>
           <Link to="/contact" className="btn btn-primary">Contact us</Link>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }
@@ -400,7 +437,7 @@ const CANCER_CENTERS = [
 function ClosingCTASection() {
   return (
     <div className="ep-container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
-      <div className="gl-cta-card">
+      <Reveal as="div" className="gl-cta-card">
         {CANCER_CENTERS.map((c) => (
           <div key={c.name} className={`gl-cta-mark ${c.cls}${c.logo ? ' has-logo' : ''}`}>
             {c.logo ? <img src={c.logo} alt={c.name} /> : c.name.split('\n').map((line, i) => <span key={i}>{line}</span>)}
@@ -415,7 +452,7 @@ function ClosingCTASection() {
             <Link className="btn btn-secondary" to="/contact">Talk to us</Link>
           </div>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }
@@ -442,7 +479,7 @@ export default function Landing() {
         </div>
 
         <div className="ep-container" style={{ position: 'relative', zIndex: 1, paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
-          <div className="gl-hero-frame gl-window-frame">
+          <Reveal as="div" className="gl-hero-frame gl-window-frame">
             <div className="gl-window-bar">
               <span className="gl-window-dot" style={{ background: '#ff5f57' }} />
               <span className="gl-window-dot" style={{ background: '#febc2e' }} />
@@ -450,7 +487,7 @@ export default function Landing() {
               <span style={{ marginLeft: 8, fontSize: 12, color: 'rgba(34,48,43,.55)' }}>Your dashboard, at a glance</span>
             </div>
             <div style={{ aspectRatio: '16/7', background: 'linear-gradient(160deg, #cfe9df 0%, #e8f2ee 60%, #f2f5f3 100%)' }} />
-          </div>
+          </Reveal>
         </div>
       </div>
 
@@ -458,8 +495,10 @@ export default function Landing() {
         <div className="ep-container" style={{ position: 'relative', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
           <div className="gl-blob" style={{ width: 300, height: 300, top: 40, right: 0, background: 'radial-gradient(circle, rgba(140,180,210,.4), transparent 70%)', animation: 'gl-float2 16s ease-in-out infinite' }} />
           <div className="gl-blob" style={{ width: 260, height: 260, bottom: -40, left: '10%', background: 'radial-gradient(circle, rgba(126,211,183,.4), transparent 70%)', animation: 'gl-float 14s ease-in-out infinite' }} />
-          <h6 style={{ position: 'relative', zIndex: 1, color: 'var(--color-accent-700)' }}>A guide through treatment</h6>
-          <h2 style={{ position: 'relative', zIndex: 1, marginTop: 'var(--space-2)', maxWidth: '22ch' }}>Everything care requires, nothing it doesn't.</h2>
+          <Reveal style={{ position: 'relative', zIndex: 1 }}>
+            <h6 style={{ color: 'var(--color-accent-700)' }}>A guide through treatment</h6>
+            <h2 style={{ marginTop: 'var(--space-2)', maxWidth: '22ch' }}>Everything care requires, nothing it doesn't.</h2>
+          </Reveal>
           <div style={{ marginTop: 'var(--space-8)' }}>
             <StickyFeatureSteps />
           </div>
@@ -471,13 +510,13 @@ export default function Landing() {
       <div className="gl-marquee-band">
         <PartnerMarquee />
 
-        <div className="ep-container" style={{ position: 'relative', zIndex: 1, maxWidth: 620, textAlign: 'center', paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+        <Reveal className="ep-container" style={{ position: 'relative', zIndex: 1, maxWidth: 620, textAlign: 'center', paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
           <div className="gl-quote-avatar-plain" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.5" stroke="currentColor" strokeWidth="1.4" /><path d="M4.5 20c1-3.8 4.2-6 7.5-6s6.5 2.2 7.5 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
           </div>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 600, lineHeight: 1.4, margin: 'var(--space-4) 0 0', color: '#22302b' }}>&ldquo;For the first time since my diagnosis, I didn't feel like I was managing this alone.&rdquo;</p>
           <p className="text-muted" style={{ marginTop: 'var(--space-3)', fontSize: 13 }}>— Elpis patient, in treatment since 2025</p>
-        </div>
+        </Reveal>
       </div>
 
       <FAQSection />
