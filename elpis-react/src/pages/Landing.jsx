@@ -457,6 +457,35 @@ function ClosingCTASection() {
   );
 }
 
+// Plays the hero demo video muted/looping. Setting `muted` as a JSX
+// attribute only sets the HTML attribute, not the DOM property browsers
+// actually check for autoplay — without setting `.muted` imperatively here,
+// some browsers silently block autoplay, so the video never gets going long
+// enough to loop. loop stays as a JSX attribute since that one works fine.
+function HeroVideo() {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    video.muted = true;
+    video.play().catch(() => {});
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      src="/elpis-animation.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+      controls
+      style={{ display: 'block', width: '100%', aspectRatio: '16/9', objectFit: 'cover', background: '#0c1512' }}
+    />
+  );
+}
+
 export default function Landing() {
   return (
     <div className="gl-public">
@@ -478,15 +507,15 @@ export default function Landing() {
           </div>
         </div>
 
-        <div className="ep-container" style={{ position: 'relative', zIndex: 1, paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
+        <div className="ep-container" style={{ position: 'relative', zIndex: 1, paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)', maxWidth: 1440 }}>
           <Reveal as="div" className="gl-hero-frame gl-window-frame">
             <div className="gl-window-bar">
               <span className="gl-window-dot" style={{ background: '#ff5f57' }} />
               <span className="gl-window-dot" style={{ background: '#febc2e' }} />
               <span className="gl-window-dot" style={{ background: '#28c840' }} />
-              <span style={{ marginLeft: 8, fontSize: 12, color: 'rgba(34,48,43,.55)' }}>Your dashboard, at a glance</span>
+              <span style={{ marginLeft: 8, fontSize: 12, color: 'rgba(34,48,43,.55)' }}>See Elpis in action</span>
             </div>
-            <div style={{ aspectRatio: '16/7', background: 'linear-gradient(160deg, #cfe9df 0%, #e8f2ee 60%, #f2f5f3 100%)' }} />
+            <HeroVideo />
           </Reveal>
         </div>
       </div>
